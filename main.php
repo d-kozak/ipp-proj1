@@ -6,11 +6,9 @@
  * Time: 22:53
  */
 
-include 'functions.php';
-include 'classes.php';
-include 'algorithms.php';
-include 'parser.php';
+include 'include.php';
 
-$var = "({A,B,C},{'x','y','z'},{A'x'->B,B'y'->C},A,{C})";
+$fi = syntactic_analysis();
 
-parse_input($var);
+if($file != null)
+    fclose($file);
