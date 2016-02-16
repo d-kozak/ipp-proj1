@@ -7,10 +7,38 @@
  */
 
 $last_char = null;
+$next_token = null;
+
+function put_token_back($token){
+    global $next_token;
+    if($next_token != null){
+        print_error_line("next token variable should be always null when calling put_token_back");
+        exit(666);
+    }
+    $next_token = $token;
+}
+
+function print_token($tkn){
+    global $buffer_id;
+    echo "\tTOKEN:\n\t\ttype : " .$tkn["id"] . " \n\t\tvalue: " . $tkn[$buffer_id] . PHP_EOL;
+}
+
+function get_and_print_next_token(){
+    $token = get_next_token();
+    print_token($token);
+    return $token;
+}
 
 function get_next_token()
 {
-    global $file, $file_name, $last_char, $buffer_id;
+    global $file, $file_name, $last_char, $buffer_id,$next_token,$debug_lexical;
+
+    if($next_token != null){
+        $tmp = $next_token;
+        $next_token = null;
+        return $tmp;
+    }
+
     if ($file == null) {
         $file = fopen($file_name, "r") or die("Cant open input file " . $file_name);
     }
@@ -30,7 +58,10 @@ function get_next_token()
         if($next_char == null)
             break;
 
-        echo "state: " . $state . PHP_EOL;
+        if($debug_lexical)
+            if($state != LexicalDFISTates::comment)
+                echo "state: " . $state . PHP_EOL;
+
         switch ($state) {
             case LexicalDFISTates::start:
                 if ($next_char == "(") {
@@ -49,11 +80,7 @@ function get_next_token()
                     $token["id"] = Tokens::comma;
                     return $token;
                 } elseif ($next_char == "-") {
-                    $token["id"] = Tokens::dash;
-                    return $token;
-                } elseif ($next_char == ">") {
-                    $token["id"] = Tokens::operator_bigger;
-                    return $token;
+                    $state = LexicalDFISTates::dash;
                 } elseif($next_char == "#"){
                     $state = LexicalDFISTates::comment;
                 }
@@ -115,17 +142,29 @@ function get_next_token()
                 if ($next_char == '\'') {
                     $state = LexicalDFISTates::symbol_wait_for_double_quote_2;
                 } else {
-                    mindfuck($state,$next_char);
+                    $last_char = $next_char;
+                    $token["id"] = Tokens::fi_symbol;
+                    $token[$buffer_id] = "epsilon";
+                    return $token;
                 }
                 break;
 
             case LexicalDFISTates::symbol_wait_for_double_quote_2:
                 if ($next_char == '\'') {
                     $token["id"] = Tokens::fi_symbol;
+                    $token[$buffer_id] = '\'';
                     return $token;
                 } else {
                     mindfuck($state,$next_char);
                 }
+                break;
+
+            case LexicalDFISTates::dash:
+                if($next_char == ">"){
+                    $token["id"] = Tokens::arrow;
+                    return $token;
+                } else
+                    mindfuck($state,$next_token);
                 break;
 
             case LexicalDFISTates::comment:
