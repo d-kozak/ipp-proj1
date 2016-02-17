@@ -47,6 +47,11 @@ class Rule
         return true;
     }
 
+    public function is_epsilon_rule()
+    {
+        return $this->character == " ";
+    }
+
     /**
      * @return mixed
      */
@@ -103,8 +108,13 @@ class FI
     {
         global $debug;
 
-        if($debug)
+        if ($debug)
             print_info_line("Started semantic analysis");
+
+        if (empty($this->alphabet)) {
+            print_error_line("Alphabet is empty");
+            return false;
+        }
 
         if (!in_array($this->startState, $this->states)) {
             print_error_line("Start state " . $this->startState . " not found in states set");
@@ -118,18 +128,62 @@ class FI
             }
         }
 
-        if(!$this->check_states())
+        if (!$this->check_states())
             return false;
 
-        if($debug)
+        if ($debug)
             print_info_line("Finished semantic analysis");
 
         return true;
     }
 
-    private function check_states(){
-        foreach($this->rules as $rule){
-            if(!$rule->check_rule($this))
+    public function get_epsilon_uzaver($state)
+    {
+        if (in_array($state, $this->states)) {
+            print_error_line("internal error, epsilon uzaver called with illegal state");
+            exit(666);
+        }
+
+        $epsilon_uzaver = [$state];
+
+        $changed = true;
+        while ($changed) {
+            $changed = false;
+
+            foreach ($epsilon_uzaver as $eps_state) {
+                $rules = $this->get_epsilon_rules($eps_state);
+
+                foreach ($rules as $rule) {
+                    $right_state = $rule->getRightState();
+
+                    if (!in_array($right_state, $epsilon_uzaver)) {
+                        $epsilon_uzaver[] = $right_state;
+                        $changed = true;
+                    }
+                }
+            }
+        }
+
+        echo "Epsilon uzaver stavu " . $state . "je: ";
+        print_r($epsilon_uzaver);
+    }
+
+    private function get_epsilon_rules($state)
+    {
+        $result = array();
+
+        foreach ($this->rules as $rule) {
+            if ($rule->getLeftState() == $state and $rule->is_epsilon_rule())
+                $result[] = $rule;
+        }
+
+        return $result;
+    }
+
+    private function check_states()
+    {
+        foreach ($this->rules as $rule) {
+            if (!$rule->check_rule($this))
                 return false;
         }
         return true;
