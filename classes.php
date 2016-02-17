@@ -31,15 +31,20 @@ class Rule
 
         if (!in_array($this->left_state, $states)) {
             print_error_line("Levy stav " . $this->left_state . " pravidla neni v mnozine stavu");
-            exit(41);
+            return false;
 
         } else if (!in_array($this->right_state, $states)) {
             print_error_line("Pravy stav " . $this->right_state . " pravidla neni v mnozine stavu");
-            exit(41);
-        } else if (!in_array($this->character, $FI->getAlphabet())) {
-            print_error_line("Znak pravidla " . $this->character . " neni v abecede");
-            exit(41);
+            return false;
+
         }
+        $alphabet = $FI->getAlphabet();
+        $alphabet[] = " "; // pridani epsilonu do abecedy
+        if (!in_array($this->character, $alphabet)) {
+            print_error_line("Znak pravidla '" . $this->character . "' neni v abecede");
+            return false;
+        }
+        return true;
     }
 
     /**

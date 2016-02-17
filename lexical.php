@@ -144,7 +144,7 @@ function get_next_token()
                 } else {
                     $last_char = $next_char;
                     $token["id"] = Tokens::fi_symbol;
-                    $token[$buffer_id] = "epsilon";
+                    $token[$buffer_id] = " ";
                     return $token;
                 }
                 break;
