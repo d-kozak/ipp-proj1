@@ -137,18 +137,18 @@ class FI
         return true;
     }
 
-    public function remove_epsilon_rules(){
+    public function remove_epsilon_rules()
+    {
         $new_rules = array();
-        $new_finish_state = array();
 
-        foreach($this->getStates() as $state){
+        foreach ($this->getStates() as $state) {
             $epsilon_uzaver = $this->get_epsilon_uzaver($state);
 
-            foreach($epsilon_uzaver as $eps_state){
+            foreach ($epsilon_uzaver as $eps_state) {
                 $non_epsilon_rules = $this->get_non_epsilon_rules($eps_state);
 
-                foreach($non_epsilon_rules as $non_eps_rule){
-                    $new_rules[] = new Rule($state,$non_eps_rule->getCharacter(),$non_eps_rule->getRightState());
+                foreach ($non_epsilon_rules as $non_eps_rule) {
+                    $new_rules[] = new Rule($state, $non_eps_rule->getCharacter(), $non_eps_rule->getRightState());
                 }
             }
         }
@@ -156,6 +156,18 @@ class FI
         print_info_line("rules without epsilon rules == ");
         print_r($new_rules);
 
+        $new_finish_states = array();
+
+        foreach ($this->getStates() as $state) {
+            if (!empty(array_intersect($this->get_epsilon_uzaver($state), $this->getFinishStates())))
+                $new_finish_states[] = $state;
+        }
+
+        print_info_line("new finish states without epsilon");
+        print_r($new_finish_states);
+
+        $this->rules = $new_rules;
+        $this->finishStates = $new_finish_states;
     }
 
     public function get_epsilon_uzaver($state)
@@ -221,6 +233,77 @@ class FI
                 return false;
         }
         return true;
+    }
+
+    public function print_FI()
+    {
+        print_info_line("printing current FI");
+        print_info_line("-------------------");
+
+        $result = "({";
+        $this->add_states_for_printing($result);
+        $result .= "},\n";
+
+        $result .= "{";
+        $this->add_alphabet_for_printing($result);
+        $result .= "},\n";
+
+        $result .= "{\n";
+        $this->add_rules_for_printing($result);
+        $result .= "},\n";
+
+        $result .= "{" . $this->getStartState() . "}\n";
+
+        $result .= "{";
+        $this->add_finish_states_for_printing($result);
+        $result .= "},\n)";
+
+        echo $result;
+
+        print_info_line("--------end--------");
+    }
+
+    function add_states_for_printing(&$result)
+    {
+        $states = $this->getStates();
+        $len = count($states);
+        for ($i = 0; $i < $len; $i++) {
+            if ($i < $len - 1)
+                $result .= $states[$i] . ", ";
+            else
+                $result .= $states[$i];
+        }
+    }
+
+    function add_finish_states_for_printing(&$result)
+    {
+        $states = $this->getFinishStates();
+        $len = count($states);
+        for ($i = 0; $i < $len; $i++) {
+            if ($i < $len - 1)
+                $result .= $states[$i] . ", ";
+            else
+                $result .= $states[$i];
+        }
+    }
+
+    function add_alphabet_for_printing(&$result)
+    {
+        $alphabet = $this->getAlphabet();
+        $len = count($alphabet);
+        for ($i = 0; $i < $len; $i++) {
+            if ($i < $len - 1)
+                $result .= '\'' . $alphabet[$i] . '\', ';
+            else
+                $result .= '\'' . $alphabet[$i] . '\'';
+        }
+    }
+
+    function add_rules_for_printing(&$result)
+    {
+        foreach ($this->getRules() as $rule) {
+            $result .= $rule->getLeftState() . " " . $rule->getCharacter() . " -> " . $rule->getRightState() . ",\n";
+        }
     }
 
     /**

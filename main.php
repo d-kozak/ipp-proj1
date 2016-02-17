@@ -37,5 +37,7 @@ foreach($FI->getStates() as $state){
 
 $FI->remove_epsilon_rules();
 
+$FI->print_FI();
+
 if($file != null)
     fclose($file);
