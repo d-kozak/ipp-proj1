@@ -137,10 +137,31 @@ class FI
         return true;
     }
 
+    public function remove_epsilon_rules(){
+        $new_rules = array();
+        $new_finish_state = array();
+
+        foreach($this->getStates() as $state){
+            $epsilon_uzaver = $this->get_epsilon_uzaver($state);
+
+            foreach($epsilon_uzaver as $eps_state){
+                $non_epsilon_rules = $this->get_non_epsilon_rules($eps_state);
+
+                foreach($non_epsilon_rules as $non_eps_rule){
+                    $new_rules[] = new Rule($state,$non_eps_rule->getCharacter(),$non_eps_rule->getRightState());
+                }
+            }
+        }
+
+        print_info_line("rules without epsilon rules == ");
+        print_r($new_rules);
+
+    }
+
     public function get_epsilon_uzaver($state)
     {
-        if (in_array($state, $this->states)) {
-            print_error_line("internal error, epsilon uzaver called with illegal state");
+        if (!in_array($state, $this->states)) {
+            print_error_line("internal error, epsilon uzaver called with illegal state " . $state);
             exit(666);
         }
 
@@ -164,8 +185,9 @@ class FI
             }
         }
 
-        echo "Epsilon uzaver stavu " . $state . "je: ";
+        echo "Epsilon uzaver stavu " . $state . " je: ";
         print_r($epsilon_uzaver);
+        return $epsilon_uzaver;
     }
 
     private function get_epsilon_rules($state)
@@ -174,6 +196,18 @@ class FI
 
         foreach ($this->rules as $rule) {
             if ($rule->getLeftState() == $state and $rule->is_epsilon_rule())
+                $result[] = $rule;
+        }
+
+        return $result;
+    }
+
+    private function get_non_epsilon_rules($state)
+    {
+        $result = array();
+
+        foreach ($this->rules as $rule) {
+            if ($rule->getLeftState() == $state and !$rule->is_epsilon_rule())
                 $result[] = $rule;
         }
 

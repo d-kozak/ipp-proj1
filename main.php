@@ -29,5 +29,13 @@ if(!$res)
 if(!$FI->check_fi())
     exit(42);
 
+foreach($FI->getStates() as $state){
+    print_info_line("exploring state " . $state);
+    print_r($FI->get_epsilon_uzaver($state));
+    print_info_line("finished exploring");
+}
+
+$FI->remove_epsilon_rules();
+
 if($file != null)
     fclose($file);

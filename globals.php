@@ -6,7 +6,7 @@
  * Time: 20:10
  */
 
-$file_name = 'input/input2.txt';
+$file_name = 'input/input3.txt';
 $arguments = array();
 
 $file = null;
