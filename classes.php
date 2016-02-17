@@ -18,29 +18,26 @@ class Rule
      * @param $character
      * @param $right_state
      */
-    public function __construct($left_state, $character, $right_state, FI $FI)
+    public function __construct($left_state, $character, $right_state)
     {
         $this->left_state = $left_state;
         $this->character = $character;
         $this->right_state = $right_state;
-
-        $this->check_rule($FI);
     }
 
-    private function check_rule(FI $FI)
+    public function check_rule(FI $FI)
     {
-        print_error_line("Checking rule not implementted yet");
         $states = $FI->getStates();
 
         if (!in_array($this->left_state, $states)) {
-            print_error_line("Levy stav ". $this->left_state ." pravidla neni v mnozine stavu");
+            print_error_line("Levy stav " . $this->left_state . " pravidla neni v mnozine stavu");
             exit(41);
 
         } else if (!in_array($this->right_state, $states)) {
-            print_error_line("Pravy stav ". $this->right_state . " pravidla neni v mnozine stavu");
+            print_error_line("Pravy stav " . $this->right_state . " pravidla neni v mnozine stavu");
             exit(41);
-        } else if (!in_array($this->character, $FI->getAlphabet())){
-            print_error_line("Znak pravidla ". $this->character ." neni v abecede");
+        } else if (!in_array($this->character, $FI->getAlphabet())) {
+            print_error_line("Znak pravidla " . $this->character . " neni v abecede");
             exit(41);
         }
     }
@@ -91,53 +88,46 @@ class FI
     public function __construct($states, $alphabet, $rules, $startState, $finishStates)
     {
         $this->states = $states;
-        $this->alphabet = $this->prepare_alphabet($alphabet);
-        $this->rules = $this->parse_rules($rules);
+        $this->alphabet = $alphabet;
+        $this->rules = $rules;
         $this->startState = is_array($startState) ? $startState[0] : $startState;
         $this->finishStates = $finishStates;
-
-        $this->check_fi();
     }
 
-    private function prepare_alphabet($alphabet){
-        $result = $this->remove_quotes_from_alphabet($alphabet);
-        $result[] = 'E'; // temporary epsilon
-        return $result;
-    }
-
-    private function remove_quotes_from_alphabet($alphabet){
-        $result = array();
-        foreach($alphabet as $character){
-            $result[] = substr($character,1,-1);
-        }
-        return $result;
-    }
-
-    private function check_fi()
+    public function check_fi()
     {
-        print_error_line("CHecking fi not implemented yet");
+        global $debug;
 
-        if(!in_array($this->startState,$this->states)){
-            print_error_line("Start state " .$this->startState . " not found in states set");
-            exit(41);
+        if($debug)
+            print_info_line("Started semantic analysis");
+
+        if (!in_array($this->startState, $this->states)) {
+            print_error_line("Start state " . $this->startState . " not found in states set");
+            return false;
         }
 
-        foreach($this->finishStates as $f_state){
-            if(!in_array($f_state,$this->states)){
-                print_error_line("Finish state " .$this->startState . " not found in states set");
-                exit(41);
+        foreach ($this->finishStates as $f_state) {
+            if (!in_array($f_state, $this->states)) {
+                print_error_line("Finish state " . $f_state . " not found in states set");
+                return false;
             }
         }
+
+        if(!$this->check_states())
+            return false;
+
+        if($debug)
+            print_info_line("Finished semantic analysis");
+
+        return true;
     }
 
-    private function parse_rules($rules)
-    {
-        $result = array();
-        foreach ($rules as $rule) {
-            $after_split = split("->", $rule);
-            $result[] = new Rule($after_split[0][0],$after_split[0][2], $after_split[1], $this);
+    private function check_states(){
+        foreach($this->rules as $rule){
+            if(!$rule->check_rule($this))
+                return false;
         }
-        return $result;
+        return true;
     }
 
     /**

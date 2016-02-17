@@ -16,6 +16,7 @@ $buffer_id = "buffer";
 $debug = true;
 $debug_lexical = false;
 
+$FI = null;
 
 abstract class Tokens
 {

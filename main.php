@@ -22,7 +22,12 @@ mb_regex_encoding('UTF-8');
 
 exit; */
 
-$fi = syntactic_analysis();
+$res = syntactic_analysis();
+if(!$res)
+    exit(41);
+
+if(!$FI->check_fi())
+    exit(42);
 
 if($file != null)
     fclose($file);

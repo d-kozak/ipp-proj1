@@ -2,7 +2,7 @@
 ({s, p,q,r ,nonTermState, # stav neukončující i nedostupný
 fin1}, # stav bude označen jako koncový
 {'a', '''', '{', ')', 'b','c','b' }, {s 'c' -> p,
-q'a' ->   r, q'{'-> r, r  'a' ->r, p'''' ->q ,
+x'a' ->   r, q'{'-> r, r  'a' ->r, p'''' ->q ,
 r ''->s # takto vypadá pravidlo, které nečte vstup; lze i takto: r '' -> s
 },
 # následuje komponenta definující počáteční stav
