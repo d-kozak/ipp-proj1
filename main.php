@@ -34,6 +34,8 @@ if($arguments["op"] == Operation::no_eps)
     $FI->remove_epsilon_rules();
 elseif($arguments["op"] == Operation::determinization)
     $FI->determinize();
+elseif($arguments["op"] == Operation::wsfa)
+    $FI->wsfa();
 elseif($arguments["op"] != Operation::validation){
     print_error_line("Internal error, not of known operations was chosen");
     exit(666);

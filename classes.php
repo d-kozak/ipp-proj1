@@ -459,6 +459,84 @@ class FI
         }
     }
 
+    public function wsfa()
+    {
+        echo "-------------------here----------------";
+        $this->determinize();
+        $this->compute_ending_states();
+        $this->complete_rules();
+    }
+
+    private function complete_rules()
+    {
+        $name = "qFalse";
+        $new_rules = array();
+
+        foreach ($this->getStates() as $state) {
+            foreach ($this->getAlphabet() as $symbol) {
+                if (!$this->contains_rule_with_left($state, $symbol)) {
+                    $new_rules[] = new Rule($state, $symbol, $name);
+                }
+            }
+        }
+
+        if (!empty($new_rules)) {
+
+            if (!in_array($name, $this->getStates())) {
+                $this->states [] = $name;
+                foreach ($this->getAlphabet() as $symbol) {
+                    $this->rules[] = new Rule($name, $symbol, $name);
+                }
+            }
+
+            $this->rules = array_merge($this->rules, $new_rules);
+        }
+    }
+
+    private function contains_rule_with_left($left_state, $symbol)
+    {
+        foreach ($this->getRules() as $rule) {
+            if ($rule->getLeftState() == $left_state and $rule->getCharacter() == $symbol)
+                return true;
+        }
+        return false;
+    }
+
+    private function compute_ending_states()
+    {
+
+        $good_states = array();
+        $stack = $this->getFinishStates();
+
+        while (!empty($stack)) {
+
+            $state = $stack[array_rand($stack, 1)];
+            $stack = array_diff($stack, [$state]);
+
+            foreach ($this->get_all_left_states_from_right_state($state) as $state) {
+                if (!in_array($state, $good_states)) {
+                    $good_states [] = $state;
+                    $stack[] = $state;
+                }
+            }
+        }
+        $this->states = $good_states;
+        if (!in_array($this->startState, $good_states))
+            $this->states[] = "qFalse";
+    }
+
+    private function get_all_left_states_from_right_state($state)
+    {
+        $result = array();
+
+        foreach ($this->getRules() as $rule) {
+            if ($rule->getRightState() == $state)
+                $result[] = $rule->getLeftState();
+        }
+
+        return $result;
+    }
+
     /**
      * @return mixed
      */

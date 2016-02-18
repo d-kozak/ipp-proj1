@@ -17,7 +17,8 @@ function parse_arguments()
         "output:",
         "no-epsilon-rules",
         "determinization",
-        "case-insensitive"
+        "case-insensitive",
+        "wsfa"
     );
 
     $short_opts = "edi"; // e=no epsilon d=determinization  i=case insensitive
@@ -67,6 +68,7 @@ function parse_arguments()
 
     $no_eps = false;
     $determinizaton = false;
+    $wsfa = false;
 
     if (isset($options[$long_opts[3]]) || isset($options["e"])) {
         $no_eps = true;
@@ -76,23 +78,29 @@ function parse_arguments()
         $determinizaton = true;
     }
 
+    if(isset($options[$long_opts[6]]))
+        $wsfa = true;
+
     if (isset($options[$long_opts[5]]) || isset($options["i"])) {
         $arguments["case_in"] = true;
     } else {
         $arguments["case_in"] = false;
     }
 
-    if($determinizaton && $no_eps){
+    if(($determinizaton && $no_eps) || ($determinizaton && $wsfa) || ($no_eps && $wsfa)){
         print_error_line("Arguments determinization and no-epsilon-rules cant be combined,
         please choose just one, of them");
         exit(1);
-    } else if(!$determinizaton && !$no_eps){
+    } else if(!$determinizaton && !$no_eps && !$wsfa){
         $arguments["op"] = Operation::validation;
     } else if($determinizaton) {
         $arguments["op"] = Operation::determinization;
     }
     else if($no_eps)
         $arguments["op"] = Operation::no_eps;
+    else if($wsfa) {
+        $arguments["op"] = Operation::wsfa;
+    }
     else{
         print_error_line("Internal error in args, this option should never happen");
         exit(666);
@@ -109,4 +117,5 @@ class Operation{
     const validation = 0;
     const no_eps = 1;
     const determinization = 2;
+    const wsfa = 3;
 }
