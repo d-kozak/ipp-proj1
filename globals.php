@@ -5,11 +5,7 @@
  * Date: 15.2.16
  * Time: 20:10
  */
-
-$file_name = 'input/input4.txt';
 $arguments = array();
-
-$file = null;
 
 $buffer_id = "buffer";
 

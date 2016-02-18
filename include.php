@@ -9,6 +9,7 @@
 include 'lexical.php';
 include 'syntactic.php';
 include 'globals.php';
+include 'args_parser.php';
 include 'functions.php';
 include 'SuperState.php';
 include 'classes.php';

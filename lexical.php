@@ -31,7 +31,7 @@ function get_and_print_next_token(){
 
 function get_next_token()
 {
-    global $file, $file_name, $last_char, $buffer_id,$next_token,$debug_lexical;
+    global  $arguments,$last_char, $buffer_id,$next_token,$debug_lexical;
 
     if($next_token != null){
         $tmp = $next_token;
@@ -39,21 +39,18 @@ function get_next_token()
         return $tmp;
     }
 
-    if ($file == null) {
-        $file = fopen($file_name, "r") or die("Cant open input file " . $file_name);
-    }
     $token = array();
 
     $token[$buffer_id] = "";
     $state = LexicalDFISTates::start;
 
-    while (!feof($file)) {
+    while (!feof($arguments["input"])) {
 
         if ($last_char != null) {
             $next_char = $last_char;
             $last_char = null;
         } else
-            $next_char = fgetc($file);
+            $next_char = fgetc($arguments["input"]);
 
         if($next_char == null)
             break;

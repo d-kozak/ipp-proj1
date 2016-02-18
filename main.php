@@ -22,24 +22,27 @@ mb_regex_encoding('UTF-8');
 
 exit; */
 
-$res = syntactic_analysis();
-if(!$res)
+parse_arguments();
+
+if(!syntactic_analysis())
     exit(41);
 
 if(!$FI->check_fi())
     exit(42);
 
-foreach($FI->getStates() as $state){
-    print_info_line("exploring state " . $state);
-    print_r($FI->get_epsilon_uzaver($state));
-    print_info_line("finished exploring");
+if($arguments["op"] == Operation::no_eps)
+    $FI->remove_epsilon_rules();
+elseif($arguments["op"] == Operation::determinization)
+    $FI->determinize();
+elseif($arguments["op"] != Operation::validation){
+    print_error_line("Internal error, not of known operations was chosen");
+    exit(666);
 }
-
-$FI->remove_epsilon_rules();
 
 $FI->print_FI();
 
-$FI->determinize();
+if($arguments["input"] != STDIN)
+    fclose($arguments["input"]);
 
-if($file != null)
-    fclose($file);
+if($arguments["output"] != STDOUT)
+    fclose($arguments["output"]);
