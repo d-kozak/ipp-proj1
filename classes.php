@@ -235,6 +235,58 @@ class FI
         return true;
     }
 
+    public function determinize()
+    {
+        $this->remove_epsilon_rules();
+
+        print_info_line("-----------------------Determinization started---------------------------");
+
+        $Sd = new SuperState([$this->getStartState()]);
+        $Qnew = [$Sd];
+        $Rd = [];
+        $Qd = [];
+        $Fd = [];
+
+        do {
+            $Qcarka = $Qnew[0];
+            $Qnew = array_diff($Qnew, [$Qcarka]);
+
+            if (!in_array($Qcarka, $Qd))
+                $Qd[] = $Qcarka;
+
+            foreach ($this->getAlphabet() as $symbol) {
+                $Qcarkacarka = array();
+                foreach ($Qcarka as $tmpState) {
+                    $non_eps_rules = $this->get_non_epsilon_rules($tmpState);
+
+                    foreach ($non_eps_rules as $rule) {
+                        $Qcarkacarka[] = $rule->getRightState();
+                    }
+                }
+
+                if (!empty($Qcarkacarka)) {
+                    $Rd[] = new Rule($Qcarka, $symbol, new SuperState($Qcarkacarka));
+
+                    if (empty(array_intersect($Qd, $Qcarkacarka))) {
+                        $Qnew[] = new SuperState($Qcarkacarka);
+                    }
+                }
+
+                if (!empty(array_intersect($this->getFinishStates(), [$Qcarka])))
+                    $Fd[] = $Qcarka;
+
+            }
+        } while (!empty($Qnew));
+
+        $this->states = $Qd;
+        $this->rules = $Rd;
+        $this->startState = $Sd;
+        $this->finishStates = $Fd;
+
+        $this->print_FI();
+        print_info_line("-----------------------Determinization finished---------------------------");
+    }
+
     public function print_FI()
     {
         print_info_line("printing current FI");

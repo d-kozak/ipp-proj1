@@ -10,6 +10,7 @@ include 'lexical.php';
 include 'syntactic.php';
 include 'globals.php';
 include 'functions.php';
+include 'SuperState.php';
 include 'classes.php';
 include 'algorithms.php';
 include 'parser.php';
