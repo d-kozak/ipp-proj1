@@ -78,6 +78,7 @@ function S()
 function START_TWO()
 {
     global $debug,$buffer_id,$FI;
+
     if ($debug)
         print_info_line("\trule S-2");
 

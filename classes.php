@@ -414,6 +414,7 @@ class FI
     function add_states_for_printing(&$result)
     {
         $states = $this->getStates();
+        sort($states);
         $len = count($states);
         for ($i = 0; $i < $len; $i++) {
             if ($i < $len - 1)
@@ -426,6 +427,7 @@ class FI
     function add_finish_states_for_printing(&$result)
     {
         $states = $this->getFinishStates();
+        sort($states);
         $len = count($states);
         for ($i = 0; $i < $len; $i++) {
             if ($i < $len - 1)
@@ -438,6 +440,7 @@ class FI
     function add_alphabet_for_printing(&$result)
     {
         $alphabet = $this->getAlphabet();
+        sort($alphabet);
         $len = count($alphabet);
         for ($i = 0; $i < $len; $i++) {
             if ($i < $len - 1)
