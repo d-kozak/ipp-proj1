@@ -159,7 +159,8 @@ class FI
         $new_finish_states = array();
 
         foreach ($this->getStates() as $state) {
-            if (!empty(array_intersect($this->get_epsilon_uzaver($state), $this->getFinishStates())))
+            $intersection = array_intersect($this->get_epsilon_uzaver($state), $this->getFinishStates());
+            if (!empty($intersection))
                 $new_finish_states[] = $state;
         }
 
@@ -248,32 +249,57 @@ class FI
         $Fd = [];
 
         do {
-            $Qcarka = $Qnew[0];
+            echo "Qnew contaions....".PHP_EOL;
+            print_r($Qnew);
+            $Qcarka = $Qnew[array_rand($Qnew,1)];
+            echo "randomly chosen ".PHP_EOL;
+            print_r($Qcarka);
             $Qnew = array_diff($Qnew, [$Qcarka]);
 
             if (!in_array($Qcarka, $Qd))
                 $Qd[] = $Qcarka;
 
             foreach ($this->getAlphabet() as $symbol) {
+                echo "iterating over symbol " . $symbol .  PHP_EOL;
                 $Qcarkacarka = array();
-                foreach ($Qcarka as $tmpState) {
+                foreach ($Qcarka->get_iterator() as $tmpState) {
+                    print_info_line("iterating in Qcarka as tmpstate: " .$tmpState);
                     $non_eps_rules = $this->get_non_epsilon_rules($tmpState);
 
+                    print_info_line("found rules: ");
+                    print_r($non_eps_rules);
+
                     foreach ($non_eps_rules as $rule) {
-                        $Qcarkacarka[] = $rule->getRightState();
+                        if($rule->getCharacter() == $symbol) {
+                            $right_state = $rule->getRightState();
+                            if(!in_array($right_state,$Qcarkacarka))
+                                $Qcarkacarka[] =  $right_state;
+                        }
                     }
                 }
 
-                if (!empty($Qcarkacarka)) {
-                    $Rd[] = new Rule($Qcarka, $symbol, new SuperState($Qcarkacarka));
+                print_info_line("qcarkacarka:");
+                print_r($Qcarkacarka);
 
-                    if (empty(array_intersect($Qd, $Qcarkacarka))) {
+                if (!empty($Qcarkacarka)) {
+                    $tmpRule = new Rule($Qcarka, $symbol, new SuperState($Qcarkacarka));
+                    if(!in_array($tmpRule,$Rd))
+                        $Rd[] = $tmpRule;
+                    $intersection = array_intersect($Qd, $Qcarkacarka);
+                    if (empty($intersection)) {
                         $Qnew[] = new SuperState($Qcarkacarka);
                     }
                 }
+                echo "--------------------------------------".PHP_EOL;
+                print_r($this->getFinishStates());
+                print_r($Qcarka->getStates());
+                echo "--------------------------------------".PHP_EOL;
 
-                if (!empty(array_intersect($this->getFinishStates(), [$Qcarka])))
-                    $Fd[] = $Qcarka;
+                $intersection = array_intersect($this->getFinishStates(), $Qcarka->getStates());
+                if (!empty($intersection)) {
+                    if(!in_array($Qcarka,$Fd))
+                        $Fd[] = $Qcarka;
+                }
 
             }
         } while (!empty($Qnew));

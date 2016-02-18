@@ -6,7 +6,7 @@
  * Date: 18.2.16
  * Time: 9:05
  */
-class SuperState implements Iterator
+class SuperState
 {
     private $states;
 
@@ -41,70 +41,17 @@ class SuperState implements Iterator
         return substr($result,0,-1);
     }
 
-
-    /**
-     * Return the current element
-     * @link http://php.net/manual/en/iterator.current.php
-     * @return mixed Can return any type.
-     * @since 5.0.0
-     */
-    public function current()
-    {
-        $var = current($this->states);
-        echo "current: $var\n";
-        return $var;
+    public function get_iterator(){
+        return new ArrayIterator($this->states);
     }
 
     /**
-     * Move forward to next element
-     * @link http://php.net/manual/en/iterator.next.php
-     * @return void Any returned value is ignored.
-     * @since 5.0.0
+     * @return array
      */
-    public function next()
+    public function getStates()
     {
-        $var = next($this->states);
-        echo "next: $var\n";
-        //return $var;
+        return $this->states;
     }
 
-    /**
-     * Return the key of the current element
-     * @link http://php.net/manual/en/iterator.key.php
-     * @return mixed scalar on success, or null on failure.
-     * @since 5.0.0
-     */
-    public function key()
-    {
-        $var = key($this->states);
-        echo "key: $var\n";
-        return $var;
-    }
 
-    /**
-     * Checks if current position is valid
-     * @link http://php.net/manual/en/iterator.valid.php
-     * @return boolean The return value will be casted to boolean and then evaluated.
-     * Returns true on success or false on failure.
-     * @since 5.0.0
-     */
-    public function valid()
-    {
-        $key = key($this->states);
-        $var = ($key !== NULL && $key !== FALSE);
-        echo "valid: $var\n";
-        return $var;
-    }
-
-    /**
-     * Rewind the Iterator to the first element
-     * @link http://php.net/manual/en/iterator.rewind.php
-     * @return void Any returned value is ignored.
-     * @since 5.0.0
-     */
-    public function rewind()
-    {
-        echo "rewinding\n";
-        reset($this->states);
-    }
 }
