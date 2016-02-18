@@ -52,6 +52,12 @@ class Rule
         return $this->character == " ";
     }
 
+    function __toString()
+    {
+        return $this->left_state . $this->character . $this->right_state;
+    }
+
+
     /**
      * @return mixed
      */
@@ -76,6 +82,30 @@ class Rule
         return $this->right_state;
     }
 
+    /**
+     * @param mixed $left_state
+     */
+    public function setLeftState($left_state)
+    {
+        $this->left_state = $left_state;
+    }
+
+    /**
+     * @param mixed $character
+     */
+    public function setCharacter($character)
+    {
+        $this->character = $character;
+    }
+
+    /**
+     * @param mixed $right_state
+     */
+    public function setRightState($right_state)
+    {
+        $this->right_state = $right_state;
+    }
+
 
 }
 
@@ -97,10 +127,48 @@ class FI
      */
     public function __construct($states, $alphabet, $rules, $startState, $finishStates)
     {
+        global $arguments;
+
+        if ($arguments["case_in"]) {
+            foreach ($states as &$state) {
+                $state = strtolower($state);
+            }
+
+            foreach ($alphabet as &$symbol) {
+                $symbol = strtolower($symbol);
+            }
+
+            foreach ($rules as &$rule) {
+                $rule->setLeftState(strtolower($rule->getLeftState()));
+                $rule->setCharacter(strtolower($rule->getCharacter()));
+                $rule->setRightState(strtolower($rule->getRightState()));
+            }
+
+            $startState = strtolower($startState);
+
+            foreach ($finishStates as &$f_state) {
+                $f_state = strtolower($f_state);
+            }
+        }
+
+        $states = array_unique($states);
+        $states = array_values($states);
+
+        $alphabet = array_unique($alphabet);
+        $alphabet = array_values($alphabet);
+
+        $rules = array_unique($rules);
+        $rules = array_values($rules);
+
+        $finishStates = array_unique($finishStates);
+        $finishStates = array_values($finishStates);
+
+        $startState = is_array($startState) ? $startState[0] : $startState;
+
         $this->states = $states;
         $this->alphabet = $alphabet;
         $this->rules = $rules;
-        $this->startState = is_array($startState) ? $startState[0] : $startState;
+        $this->startState = $startState;
         $this->finishStates = $finishStates;
     }
 
@@ -338,7 +406,7 @@ class FI
         $this->add_finish_states_for_printing($result);
         $result .= "},\n)";
 
-        fprintf($arguments["output"],$result);
+        fprintf($arguments["output"], $result);
 
         print_info_line("--------end--------");
     }

@@ -73,7 +73,6 @@ function parse_arguments()
     }
 
     if (isset($options[$long_opts[4]]) || isset($options["d"])) {
-        echo "here";
         $determinizaton = true;
     }
 
@@ -90,7 +89,6 @@ function parse_arguments()
     } else if(!$determinizaton && !$no_eps){
         $arguments["op"] = Operation::validation;
     } else if($determinizaton) {
-        echo "there";
         $arguments["op"] = Operation::determinization;
     }
     else if($no_eps)
