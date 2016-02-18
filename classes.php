@@ -400,11 +400,11 @@ class FI
         $this->add_rules_for_printing($result);
         $result .= "},\n";
 
-        $result .= "{" . $this->getStartState() . "}\n";
+        $result .= "{" . $this->getStartState() . "},\n";
 
         $result .= "{";
         $this->add_finish_states_for_printing($result);
-        $result .= "},\n)";
+        $result .= "}\n)";
 
         fprintf($arguments["output"], $result);
 
