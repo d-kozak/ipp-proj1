@@ -13,7 +13,7 @@ function print_info_line($msg){
 }
 
 function print_error_line($msg){
-    echo "ERROR: ".$msg.PHP_EOL;
+    file_put_contents('php://stderr',"ERROR: ".$msg.PHP_EOL);
 }
 
 function print_var($var){
