@@ -376,7 +376,7 @@ class FI
         $this->rules = $Rd;
         $this->startState = $Sd;
         $this->finishStates = $Fd;
-        
+
         print_info_line("-----------------------Determinization finished---------------------------");
     }
 
@@ -534,6 +534,58 @@ class FI
         }
 
         return $result;
+    }
+
+    public function check_string($string)
+    {
+        $this->check_string_symbols($string);
+        $this->determinize();
+        $current_state = $this->getStartState();
+
+        //$this->print_FI();
+
+        $strlen = strlen($string);
+        for ($i = 0; $i < $strlen; $i++,$next_state = $current_state) {
+            $char = substr($string, $i, 1);
+            $next_state = null;
+
+            print_info_line("Checking char: " . $char);
+            foreach($this->get_rules_with_left_state($current_state) as $rule){
+                print_info_line("Checking rule :" .$rule);
+
+                if($rule->getCharacter() == $char)
+                    $next_state = $rule->getRightState();
+            }
+            if($next_state == null){
+                print_error_line("There is no way to go from state " . $current_state . " with symbol " . $char);
+                echo "0";
+                exit(0);
+            }
+        }
+        print_info_line("The string was accepted");
+        echo "1";
+        exit(0);
+    }
+
+    private function check_string_symbols($string){
+        $strlen = strlen($string);
+        for ($i = 0; $i < $strlen; $i++) {
+            $char = substr($string, $i, 1);
+
+            if(!in_array($char,$this->alphabet)){
+                print_error_line("Symbol " . $char . " is not in alphabet");
+                exit(1);
+            }
+        }
+    }
+
+    private function get_rules_with_left_state($state){
+        $rules = array();
+        foreach($this->rules as $rule){
+            if($rule->getLeftState() == $state)
+                $rules[] = $rule;
+        }
+        return $rules;
     }
 
     /**

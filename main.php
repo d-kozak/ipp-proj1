@@ -36,12 +36,15 @@ elseif($arguments["op"] == Operation::determinization)
     $FI->determinize();
 elseif($arguments["op"] == Operation::wsfa)
     $FI->wsfa();
+elseif($arguments["op"] == Operation::check_string)
+    $FI->check_string($arguments["string"]);
 elseif($arguments["op"] != Operation::validation){
-    print_error_line("Internal error, not of known operations was chosen");
+    print_error_line("Internal error, none of known operations was chosen");
     exit(666);
 }
 
-$FI->print_FI();
+if($arguments["op"] != Operation::check_string)
+    $FI->print_FI();
 
 if($arguments["input"] != STDIN)
     fclose($arguments["input"]);

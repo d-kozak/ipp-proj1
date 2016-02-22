@@ -18,14 +18,15 @@ function parse_arguments()
         "no-epsilon-rules",
         "determinization",
         "case-insensitive",
-        "wsfa"
+        "wsfa",
+        "analyze-string:"
     );
 
     $short_opts = "edi"; // e=no epsilon d=determinization  i=case insensitive
 
     $options = getopt($short_opts, $long_opts);
 
-    if(empty($options)){
+    if (empty($options)) {
         print_error_line("Please add arguments via --help");
         exit(1);
     }
@@ -33,6 +34,7 @@ function parse_arguments()
     // remove the colons..
     $long_opts[1] = substr($long_opts[1], 0, -1);
     $long_opts[2] = substr($long_opts[2], 0, -1);
+    $long_opts[7] = substr($long_opts[7], 0, -1);
 
     print_var($options);
 
@@ -78,7 +80,7 @@ function parse_arguments()
         $determinizaton = true;
     }
 
-    if(isset($options[$long_opts[6]]))
+    if (isset($options[$long_opts[6]]))
         $wsfa = true;
 
     if (isset($options[$long_opts[5]]) || isset($options["i"])) {
@@ -87,21 +89,27 @@ function parse_arguments()
         $arguments["case_in"] = false;
     }
 
-    if(($determinizaton && $no_eps) || ($determinizaton && $wsfa) || ($no_eps && $wsfa)){
+    if (isset($options[$long_opts[7]])) {
+        $arguments["string"] = $options[$long_opts[7]];
+        $check_string = true;
+    } else
+        $check_string = false;
+
+    if (($determinizaton && $no_eps) || ($determinizaton && $wsfa) || ($no_eps && $wsfa) || ($check_string && $wsfa) || ($check_string && $determinizaton) || ($check_string && $no_eps)) {
         print_error_line("Arguments determinization and no-epsilon-rules cant be combined,
         please choose just one, of them");
         exit(1);
-    } else if(!$determinizaton && !$no_eps && !$wsfa){
+    } else if (!$determinizaton && !$no_eps && !$wsfa && !$check_string) {
         $arguments["op"] = Operation::validation;
-    } else if($determinizaton) {
+    } else if ($determinizaton) {
         $arguments["op"] = Operation::determinization;
-    }
-    else if($no_eps)
+    } else if ($no_eps)
         $arguments["op"] = Operation::no_eps;
-    else if($wsfa) {
+    else if ($wsfa) {
         $arguments["op"] = Operation::wsfa;
-    }
-    else{
+    } else if ($check_string)
+        $arguments["op"] = Operation::check_string;
+    else {
         print_error_line("Internal error in args, this option should never happen");
         exit(666);
     }
@@ -113,9 +121,11 @@ function print_help()
     exit(0);
 }
 
-class Operation{
+class Operation
+{
     const validation = 0;
     const no_eps = 1;
     const determinization = 2;
     const wsfa = 3;
+    const check_string = 4;
 }
