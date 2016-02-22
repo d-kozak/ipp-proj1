@@ -222,7 +222,7 @@ class FI
         }
 
         print_info_line("rules without epsilon rules == ");
-        print_r($new_rules);
+        print_var($new_rules);
 
         $new_finish_states = array();
 
@@ -233,7 +233,7 @@ class FI
         }
 
         print_info_line("new finish states without epsilon");
-        print_r($new_finish_states);
+        print_var($new_finish_states);
 
         $this->rules = $new_rules;
         $this->finishStates = $new_finish_states;
@@ -266,8 +266,8 @@ class FI
             }
         }
 
-        echo "Epsilon uzaver stavu " . $state . " je: ";
-        print_r($epsilon_uzaver);
+        print_info_line("Epsilon uzaver stavu " . $state . " je: ");
+        print_var($epsilon_uzaver);
         return $epsilon_uzaver;
     }
 
@@ -317,25 +317,25 @@ class FI
         $Fd = [];
 
         do {
-            echo "Qnew contaions...." . PHP_EOL;
-            print_r($Qnew);
+            print_info_line("Qnew contaions...." . PHP_EOL);
+            print_var($Qnew);
             $Qcarka = $Qnew[array_rand($Qnew, 1)];
-            echo "randomly chosen " . PHP_EOL;
-            print_r($Qcarka);
+            print_info_line("randomly chosen " . PHP_EOL);
+            print_var($Qcarka);
             $Qnew = array_diff($Qnew, [$Qcarka]);
 
             if (!in_array($Qcarka, $Qd))
                 $Qd[] = $Qcarka;
 
             foreach ($this->getAlphabet() as $symbol) {
-                echo "iterating over symbol " . $symbol . PHP_EOL;
+                print_info_line("iterating over symbol " . $symbol . PHP_EOL);
                 $Qcarkacarka = array();
                 foreach ($Qcarka->get_iterator() as $tmpState) {
                     print_info_line("iterating in Qcarka as tmpstate: " . $tmpState);
                     $non_eps_rules = $this->get_non_epsilon_rules($tmpState);
 
                     print_info_line("found rules: ");
-                    print_r($non_eps_rules);
+                    print_var($non_eps_rules);
 
                     foreach ($non_eps_rules as $rule) {
                         if ($rule->getCharacter() == $symbol) {
@@ -347,7 +347,7 @@ class FI
                 }
 
                 print_info_line("qcarkacarka:");
-                print_r($Qcarkacarka);
+                print_var($Qcarkacarka);
 
                 if (!empty($Qcarkacarka)) {
                     $tmpRule = new Rule($Qcarka, $symbol, new SuperState($Qcarkacarka));
@@ -358,10 +358,10 @@ class FI
                         $Qnew[] = new SuperState($Qcarkacarka);
                     }
                 }
-                echo "--------------------------------------" . PHP_EOL;
-                print_r($this->getFinishStates());
-                print_r($Qcarka->getStates());
-                echo "--------------------------------------" . PHP_EOL;
+                print_info_line("--------------------------------------" . PHP_EOL);
+                print_var($this->getFinishStates());
+                print_var($Qcarka->getStates());
+                print_info_line("--------------------------------------" . PHP_EOL);
 
                 $intersection = array_intersect($this->getFinishStates(), $Qcarka->getStates());
                 if (!empty($intersection)) {
@@ -376,8 +376,7 @@ class FI
         $this->rules = $Rd;
         $this->startState = $Sd;
         $this->finishStates = $Fd;
-
-        $this->print_FI();
+        
         print_info_line("-----------------------Determinization finished---------------------------");
     }
 
@@ -461,7 +460,7 @@ class FI
 
     public function wsfa()
     {
-        echo "-------------------here----------------";
+        print_info_line("-------------------here----------------");
         $this->determinize();
         $this->compute_ending_states();
         $this->complete_rules();

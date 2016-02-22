@@ -7,9 +7,17 @@
  */
 
 function print_info_line($msg){
-    echo "INFO: ".$msg.PHP_EOL;
+    global $debug;
+    if($debug)
+        echo "INFO: ".$msg.PHP_EOL;
 }
 
 function print_error_line($msg){
     echo "ERROR: ".$msg.PHP_EOL;
+}
+
+function print_var($var){
+    global $debug;
+    if($debug)
+        print_r($var);
 }

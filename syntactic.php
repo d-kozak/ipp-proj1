@@ -91,7 +91,7 @@ function START_TWO()
     if (!$result)
         return false;
 
-    print_r($states);
+    print_var($states);
 
     $token = get_and_print_next_token();
     if ($token["id"] != Tokens::curly_bracket_close)
@@ -111,7 +111,7 @@ function START_TWO()
     if (!$result)
         return false;
 
-    print_r($alphabet);
+    print_var($alphabet);
 
     $token = get_and_print_next_token();
     if ($token["id"] != Tokens::curly_bracket_close)
@@ -131,7 +131,7 @@ function START_TWO()
     if (!$result)
         return false;
 
-    print_r($rules);
+    print_var($rules);
 
     $token = get_and_print_next_token();
     if ($token["id"] != Tokens::curly_bracket_close)
@@ -146,7 +146,7 @@ function START_TWO()
         return false;
 
     $startState = $token[$buffer_id];
-    print_r($startState);
+    print_var($startState);
 
     $token = get_and_print_next_token();
     if ($token["id"] != Tokens::comma)
@@ -161,7 +161,7 @@ function START_TWO()
     if (!$result)
         return false;
 
-    print_r($finishStates);
+    print_var($finishStates);
 
     $token = get_and_print_next_token();
     if ($token["id"] != Tokens::curly_bracket_close)

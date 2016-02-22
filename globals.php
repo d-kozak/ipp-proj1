@@ -9,8 +9,8 @@ $arguments = array();
 
 $buffer_id = "buffer";
 
-$debug = true;
-$debug_lexical = false;
+$debug = false;
+$debug_lexical = $debug;
 
 $FI = null;
 

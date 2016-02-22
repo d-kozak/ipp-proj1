@@ -34,7 +34,7 @@ function parse_arguments()
     $long_opts[1] = substr($long_opts[1], 0, -1);
     $long_opts[2] = substr($long_opts[2], 0, -1);
 
-    print_r($options);
+    print_var($options);
 
     if (isset($options[$long_opts[0]])) { //help
         if (count($options) > 2) {

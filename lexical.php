@@ -20,7 +20,7 @@ function put_token_back($token){
 
 function print_token($tkn){
     global $buffer_id;
-    echo "\tTOKEN:\n\t\ttype : " .$tkn["id"] . " \n\t\tvalue: " . $tkn[$buffer_id] . PHP_EOL;
+    print_info_line("\tTOKEN:\n\t\ttype : " .$tkn["id"] . " \n\t\tvalue: " . $tkn[$buffer_id] . PHP_EOL);
 }
 
 function get_and_print_next_token(){

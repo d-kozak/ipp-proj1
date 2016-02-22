@@ -21,11 +21,11 @@ function parse_input($input){
 
         $FI = new FI($states,$alphabet,$rules,$start_state,$finish_states);
 
-        print_r($FI->getStates());
-        print_r($FI->getAlphabet());
-        print_r($FI->getRules());
-        print_r($FI->getStartState());
-        print_r($FI->getFinishStates());
+        print_var($FI->getStates());
+        print_var($FI->getAlphabet());
+        print_var($FI->getRules());
+        print_var($FI->getStartState());
+        print_var($FI->getFinishStates());
     }
     print_info_line(PHP_EOL."============Parsing finished==========".PHP_EOL);
 }
