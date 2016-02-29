@@ -1,7 +1,7 @@
 # Příklad konečného automatu ve vstupním formátu úlohy DKA
 ({s,s, p,q,r ,nonTermState, # stav neukončující i nedostupný
 fin1}, # stav bude označen jako koncový
-{'a', '''', '{', ')', 'b','c','b' }, {s 'c' -> p,
+{'a', '''', '{', ')', 'b','č','b' }, {s 'č' -> p,
 p'a' ->   r, q'{'-> r, r  'a' ->r, p'''' ->q ,
 r ''->s # takto vypadá pravidlo, které nečte vstup; lze i takto: r '' -> s
 },

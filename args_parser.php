@@ -52,7 +52,8 @@ function parse_arguments()
             print_error_line("Cant open input file " . $options[$long_opts[1]] . ", exiting");
             exit(2);
         }
-        $arguments["input"] = $file;
+        $chars = parse_input_file_to_chars($file,$options[$long_opts[1]]);
+        $arguments["input"] = $chars;
     } else {
         $arguments["input"] = STDIN;
     }
@@ -114,6 +115,19 @@ function parse_arguments()
         exit(666);
     }
 }
+
+function parse_input_file_to_chars($file,$name){
+    //$filecontent = file_get_contents('input/input2.txt');
+    //$filecontent = utf8_encode($filecontent);
+    //$filecontent = utf8_decode($filecontent);
+
+    $filecontent = fread($file,filesize($name));
+
+    $l = 0;
+    $res = preg_split('/(.{'.$l.'})/us', $filecontent, -1, PREG_SPLIT_NO_EMPTY|PREG_SPLIT_DELIM_CAPTURE);
+    return $res;
+}
+
 
 function print_help()
 {

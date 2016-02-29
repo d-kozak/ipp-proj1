@@ -6,6 +6,14 @@
  * Time: 22:53
  */
 
+mb_internal_encoding('UTF-8');
+mb_http_output('UTF-8');
+mb_http_input('UTF-8');
+mb_regex_encoding('UTF-8');
+header('Content-type: text/plain; charset=utf-8');
+
+
+
 include 'include.php';
 
 
@@ -45,9 +53,10 @@ elseif($arguments["op"] != Operation::validation){
 
 if($arguments["op"] != Operation::check_string)
     $FI->print_FI();
-
+/*
 if($arguments["input"] != STDIN)
     fclose($arguments["input"]);
+*/
 
 if($arguments["output"] != STDOUT)
     fclose($arguments["output"]);

@@ -29,6 +29,16 @@ function get_and_print_next_token(){
     return $token;
 }
 
+function read_one_char(){
+    global $arguments;
+    //print_r($arguments["input"]);
+    $char = array_shift($arguments["input"]);
+
+    //print_r($arguments["input"]);
+    //print_r($char);
+    return $char;
+}
+
 function get_next_token()
 {
     global  $arguments,$last_char, $buffer_id,$next_token,$debug_lexical;
@@ -44,16 +54,18 @@ function get_next_token()
     $token[$buffer_id] = "";
     $state = LexicalDFISTates::start;
 
-    while (!feof($arguments["input"])) {
+    while (!empty($arguments["input"])) {
 
         if ($last_char != null) {
             $next_char = $last_char;
             $last_char = null;
         } else
-            $next_char = fgetc($arguments["input"]);
+            $next_char = read_one_char();
 
         if($next_char == null)
             break;
+
+        echo "Next char: " . $next_char . PHP_EOL;
 
         if($debug_lexical)
             if($state != LexicalDFISTates::comment)
@@ -124,10 +136,12 @@ function get_next_token()
                     $state = LexicalDFISTates::symbol_wait_for_double_quote;
                 } else {
                     $token[$buffer_id] .= $next_char;
+                    echo $next_char." ";
                     $state = LexicalDFISTates::symbol_wait_for_quote;
                 }
                 break;
             case LexicalDFISTates::symbol_wait_for_quote:
+                echo $next_char.PHP_EOL;
                 if ($next_char == '\'') {
                     $token["id"] = Tokens::fi_symbol;
                     return $token;
