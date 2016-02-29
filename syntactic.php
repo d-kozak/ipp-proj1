@@ -73,6 +73,11 @@ function S()
     if ($token1["id"] != Tokens::bracket_close)
         return false;
 
+    // overeni, ze na konci neni smeti...
+    if(get_and_print_next_token() != null){
+        return false;
+    }
+
     return true;
 }
 

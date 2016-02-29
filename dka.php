@@ -33,10 +33,10 @@ exit; */
 parse_arguments();
 
 if(!syntactic_analysis())
-    exit(41);
+    exit(40);
 
 if(!$FI->check_fi())
-    exit(42);
+    exit(41);
 
 if($arguments["op"] == Operation::no_eps)
     $FI->remove_epsilon_rules();
