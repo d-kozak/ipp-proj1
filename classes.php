@@ -469,6 +469,8 @@ class FI
         foreach ($rules as $rule) {
             $result .= $rule->getLeftState() . " '" . $rule->getCharacter() . "' -> " . $rule->getRightState() . ",\n";
         }
+        $result = substr($result,0,-2);
+        $result .= "\n";
     }
 
     public function wsfa()
@@ -653,7 +655,7 @@ function rule_cmp(Rule $a,Rule $b){
     $res = strcmp($a->getCharacter(),$b->getCharacter());
     if($res != 0)
         return $res;
-    return state_cmp($a->getLeftState(),$a->getRightState());
+    return state_cmp($a->getRightState(),$b->getRightState());
 }
 
 function state_cmp($a, $b)

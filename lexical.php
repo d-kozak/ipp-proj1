@@ -163,7 +163,7 @@ function get_next_token()
             case LexicalDFISTates::symbol_wait_for_double_quote_2:
                 if ($next_char == '\'') {
                     $token["id"] = Tokens::fi_symbol;
-                    $token[$buffer_id] = '\'';
+                    $token[$buffer_id] = '\'\'';
                     return $token;
                 } else {
                     mindfuck($state,$next_char);
