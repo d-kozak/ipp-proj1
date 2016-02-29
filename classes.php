@@ -387,7 +387,7 @@ class FI
         print_info_line("printing current FI");
         print_info_line("-------------------");
 
-        $result = "({";
+        $result = "(\n{";
         $this->add_states_for_printing($result);
         $result .= "},\n";
 
@@ -399,7 +399,7 @@ class FI
         $this->add_rules_for_printing($result);
         $result .= "},\n";
 
-        $result .= "{" . $this->getStartState() . "},\n";
+        $result .= $this->getStartState() . ",\n";
 
         $result .= "{";
         $this->add_finish_states_for_printing($result);
@@ -413,7 +413,8 @@ class FI
     function add_states_for_printing(&$result)
     {
         $states = $this->getStates();
-        sort($states);
+        usort($states, "state_cmp");
+        //sort($states);
         $len = count($states);
         for ($i = 0; $i < $len; $i++) {
             if ($i < $len - 1)
@@ -426,7 +427,7 @@ class FI
     function add_finish_states_for_printing(&$result)
     {
         $states = $this->getFinishStates();
-        sort($states);
+        usort($states,"state_cmp");
         $len = count($states);
         for ($i = 0; $i < $len; $i++) {
             if ($i < $len - 1)
@@ -452,9 +453,9 @@ class FI
     function add_rules_for_printing(&$result)
     {
         $rules = $this->getRules();
-        sort($rules);
+        usort($rules,"rule_cmp");
         foreach ($rules as $rule) {
-            $result .= $rule->getLeftState() . " " . $rule->getCharacter() . " -> " . $rule->getRightState() . ",\n";
+            $result .= $rule->getLeftState() . " '" . $rule->getCharacter() . "' -> " . $rule->getRightState() . ",\n";
         }
     }
 
@@ -545,18 +546,18 @@ class FI
         //$this->print_FI();
 
         $strlen = strlen($string);
-        for ($i = 0; $i < $strlen; $i++,$next_state = $current_state) {
+        for ($i = 0; $i < $strlen; $i++, $next_state = $current_state) {
             $char = substr($string, $i, 1);
             $next_state = null;
 
             print_info_line("Checking char: " . $char);
-            foreach($this->get_rules_with_left_state($current_state) as $rule){
-                print_info_line("Checking rule :" .$rule);
+            foreach ($this->get_rules_with_left_state($current_state) as $rule) {
+                print_info_line("Checking rule :" . $rule);
 
-                if($rule->getCharacter() == $char)
+                if ($rule->getCharacter() == $char)
                     $next_state = $rule->getRightState();
             }
-            if($next_state == null){
+            if ($next_state == null) {
                 print_error_line("There is no way to go from state " . $current_state . " with symbol " . $char);
                 echo "0";
                 exit(0);
@@ -567,22 +568,24 @@ class FI
         exit(0);
     }
 
-    private function check_string_symbols($string){
+    private function check_string_symbols($string)
+    {
         $strlen = strlen($string);
         for ($i = 0; $i < $strlen; $i++) {
             $char = substr($string, $i, 1);
 
-            if(!in_array($char,$this->alphabet)){
+            if (!in_array($char, $this->alphabet)) {
                 print_error_line("Symbol " . $char . " is not in alphabet");
                 exit(1);
             }
         }
     }
 
-    private function get_rules_with_left_state($state){
+    private function get_rules_with_left_state($state)
+    {
         $rules = array();
-        foreach($this->rules as $rule){
-            if($rule->getLeftState() == $state)
+        foreach ($this->rules as $rule) {
+            if ($rule->getLeftState() == $state)
                 $rules[] = $rule;
         }
         return $rules;
@@ -629,4 +632,38 @@ class FI
     }
 
 
+}
+
+function rule_cmp(Rule $a,Rule $b){
+    $res = state_cmp($a->getLeftState(),$b->getLeftState());
+    if($res != 0)
+        return $res;
+    $res = strcmp($a->getCharacter(),$b->getCharacter());
+    if($res != 0)
+        return $res;
+    return state_cmp($a->getLeftState(),$a->getRightState());
+}
+
+function state_cmp($a, $b)
+{
+    if(is_string($a) && is_string($b))
+        return strcmp($a,$b);
+    elseif ($a instanceof SuperState && $b instanceof SuperState) {
+        return state_cmp($a->getStates(), $b->getStates());
+    }
+
+    $len = min(count($a),count($b));
+
+    for($i = 0 ; $i < $len ; $i++){
+        if($a[$i] > $b[$i]){
+            return 1;
+        } elseif($a[$i] < $b[$i]){
+            return -1;
+        }
+    }
+    if(count($a) > count($b))
+        return 1;
+    elseif(count($b) > count($a))
+        return -1;
+    else return 0;
 }

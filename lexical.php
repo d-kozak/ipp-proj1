@@ -65,7 +65,7 @@ function get_next_token()
         if($next_char == null)
             break;
 
-        echo "Next char: " . $next_char . PHP_EOL;
+       // echo "Next char: " . $next_char . PHP_EOL;
 
         if($debug_lexical)
             if($state != LexicalDFISTates::comment)
@@ -136,12 +136,12 @@ function get_next_token()
                     $state = LexicalDFISTates::symbol_wait_for_double_quote;
                 } else {
                     $token[$buffer_id] .= $next_char;
-                    echo $next_char." ";
+                    //echo $next_char." ";
                     $state = LexicalDFISTates::symbol_wait_for_quote;
                 }
                 break;
             case LexicalDFISTates::symbol_wait_for_quote:
-                echo $next_char.PHP_EOL;
+                //echo $next_char.PHP_EOL;
                 if ($next_char == '\'') {
                     $token["id"] = Tokens::fi_symbol;
                     return $token;

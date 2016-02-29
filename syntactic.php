@@ -48,6 +48,7 @@ FINISH_N -> epsilon
 FINISH_N -> ,state FINISH_N
 
 RULES -> RULE RULUES_N
+RULES -> epsilon
 RULE -> state symbol -> state
 RULES_N -> epsilon
 RULES_N -> ,RULE RULES_N
@@ -255,6 +256,14 @@ function RULES(&$rules)
     global $debug;
     if ($debug)
         print_info_line("\trule SET OF RULES");
+
+    $token = get_and_print_next_token();
+    if($token["id"] == Tokens::curly_bracket_close){
+        // prazdna mnozina pravidel
+        put_token_back($token);
+        return true;
+    }
+    put_token_back($token);
 
     $rule = null;
     $result = RULE($rule);
