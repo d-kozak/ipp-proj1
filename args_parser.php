@@ -26,10 +26,12 @@ function parse_arguments()
 
     $options = getopt($short_opts, $long_opts);
 
-    if (empty($options)) {
+    /*
+    if(empty($options)) {
         print_error_line("Please add arguments via --help");
         exit(1);
     }
+    */
 
     // remove the colons..
     $long_opts[1] = substr($long_opts[1], 0, -1);
@@ -55,7 +57,10 @@ function parse_arguments()
         $chars = parse_input_file_to_chars($file,$options[$long_opts[1]]);
         $arguments["input"] = $chars;
     } else {
-        $arguments["input"] = STDIN;
+        $filecontent = file_get_contents("php://stdin");
+        $l = 0;
+        $res = preg_split('/(.{'.$l.'})/us', $filecontent, -1, PREG_SPLIT_NO_EMPTY|PREG_SPLIT_DELIM_CAPTURE);
+        $arguments["input"] = $res;
     }
 
     if (isset($options[$long_opts[2]])) {

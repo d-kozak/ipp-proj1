@@ -306,71 +306,65 @@ class FI
 
     public function determinize()
     {
+        global $debug;
         $this->remove_epsilon_rules();
+        if($debug)
+            $this->print_FI();
 
         print_info_line("-----------------------Determinization started---------------------------");
 
         $Sd = new SuperState([$this->getStartState()]);
-        $Qnew = [$Sd];
+        $Qnew = [new SuperState([$Sd])];
         $Rd = [];
         $Qd = [];
         $Fd = [];
 
-        do {
-            print_info_line("Qnew contaions...." . PHP_EOL);
-            print_var($Qnew);
-            $Qcarka = $Qnew[array_rand($Qnew, 1)];
-            print_info_line("randomly chosen " . PHP_EOL);
+        while(!empty($Qnew)){
+            $Qcarka = array_shift($Qnew);
+            $Qd[] = $Qcarka;
+            print_info_line("New qcarka: ");
             print_var($Qcarka);
-            $Qnew = array_diff($Qnew, [$Qcarka]);
+            print_info_line("new qd: ");
+            print_var($Qd);
 
-            if (!in_array($Qcarka, $Qd))
-                $Qd[] = $Qcarka;
-
-            foreach ($this->getAlphabet() as $symbol) {
-                print_info_line("iterating over symbol " . $symbol . PHP_EOL);
+            foreach($this->getAlphabet() as $symbol){
                 $Qcarkacarka = array();
-                foreach ($Qcarka->get_iterator() as $tmpState) {
-                    print_info_line("iterating in Qcarka as tmpstate: " . $tmpState);
-                    $non_eps_rules = $this->get_non_epsilon_rules($tmpState);
+                foreach($Qcarka->getStates() as $qcarkastate){
+                    $specific_rules = $this->get_rules_with_left_state_and_symbol($qcarkastate,$symbol);
+                    $specific_states = $this->get_right_states_from_array_of_rules($specific_rules);
 
-                    print_info_line("found rules: ");
-                    print_var($non_eps_rules);
-
-                    foreach ($non_eps_rules as $rule) {
-                        if ($rule->getCharacter() == $symbol) {
-                            $right_state = $rule->getRightState();
-                            if (!in_array($right_state, $Qcarkacarka))
-                                $Qcarkacarka[] = $right_state;
-                        }
-                    }
+                    $Qcarkacarka = array_merge($Qcarkacarka,$specific_states);
                 }
-
-                print_info_line("qcarkacarka:");
+                print_info_line("Qcarkacarka for symbol " . $symbol . ":");
                 print_var($Qcarkacarka);
 
-                if (!empty($Qcarkacarka)) {
-                    $tmpRule = new Rule($Qcarka, $symbol, new SuperState($Qcarkacarka));
-                    if (!in_array($tmpRule, $Rd))
-                        $Rd[] = $tmpRule;
-                    $intersection = array_intersect($Qd, $Qcarkacarka);
-                    if (empty($intersection)) {
-                        $Qnew[] = new SuperState($Qcarkacarka);
+                $Qcarkacarka = array_unique($Qcarkacarka);
+                $newState = new SuperState($Qcarkacarka);
+                if(!empty($Qcarkacarka)){
+                    $rule = new Rule($Qcarka,$symbol,$newState);
+                    if(!in_array($rule,$Rd)) {
+                        $Rd[] = $rule;
+
+                        print_info_line("new rule: ");
+                        print_var($rule);
                     }
                 }
-                print_info_line("--------------------------------------" . PHP_EOL);
-                print_var($this->getFinishStates());
-                print_var($Qcarka->getStates());
-                print_info_line("--------------------------------------" . PHP_EOL);
-
-                $intersection = array_intersect($this->getFinishStates(), $Qcarka->getStates());
-                if (!empty($intersection)) {
-                    if (!in_array($Qcarka, $Fd))
-                        $Fd[] = $Qcarka;
+                if(!in_array($newState,$Qd) && !empty($Qcarkacarka)){
+                    if(!in_array($newState,$Qnew)) {
+                        $Qnew[] =  $newState;
+                    }
+                    print_info_line("Qnew for next iteration: ");
+                    print_var($Qnew);
+                    print_info_line("Current Qd :");
+                    print_var($Qd);
                 }
-
             }
-        } while (!empty($Qnew));
+            if(!empty(array_intersect($this->getFinishStates(),$Qcarka->getStates()))){
+                $Fd[] = $Qcarka;
+            }
+            //fgetc(STDIN);
+            print_info_line("------------------------------------------------------");
+        }
 
         $this->states = $Qd;
         $this->rules = $Rd;
@@ -378,6 +372,24 @@ class FI
         $this->finishStates = $Fd;
 
         print_info_line("-----------------------Determinization finished---------------------------");
+    }
+
+    private function get_right_states_from_array_of_rules($rules){
+        $result = array();
+        foreach($rules as $rule){
+            $result[] = $rule->getRightState();
+        }
+        return $result;
+    }
+
+    private function get_rules_with_left_state_and_symbol($left_state,$symbol){
+        $result  = array();
+        foreach($this->getRules() as $rule){
+            if($rule->getLeftState() == $left_state && $rule->getCharacter() == $symbol){
+                $result[] = $rule;
+            }
+        }
+        return $result;
     }
 
     public function print_FI()
