@@ -18,7 +18,7 @@ class SuperState
     {
         if(!is_array($states)){
             print_error_line("Internal error, states passed to SuperState constructor should be an array");
-            $states = [$states];
+            $states = array($states);
         }
         sort($states);
         $this->states = $states;

@@ -261,7 +261,7 @@ class FI
             exit(666);
         }
 
-        $epsilon_uzaver = [$state];
+        $epsilon_uzaver = array($state);
 
         $changed = true;
         while ($changed) {
@@ -328,11 +328,11 @@ class FI
 
         print_info_line("-----------------------Determinization started---------------------------");
 
-        $Sd = new SuperState([$this->getStartState()]);
-        $Qnew = [new SuperState([$Sd])];
-        $Rd = [];
-        $Qd = [];
-        $Fd = [];
+        $Sd = new SuperState(array($this->getStartState()));
+        $Qnew = array(new SuperState(array($Sd)));
+        $Rd = array();
+        $Qd = array();
+        $Fd = array();
 
         while(!empty($Qnew)){
             $Qcarka = array_shift($Qnew);
@@ -374,7 +374,8 @@ class FI
                     print_var($Qd);
                 }
             }
-            if(!empty(array_intersect($this->getFinishStates(),$Qcarka->getStates()))){
+            $intersection = array_intersect($this->getFinishStates(),$Qcarka->getStates());
+            if(!empty($intersection)){
                 $Fd[] = $Qcarka;
             }
             //fgetc(STDIN);
@@ -542,7 +543,7 @@ class FI
         while (!empty($stack)) {
 
             $state = $stack[array_rand($stack, 1)];
-            $stack = array_diff($stack, [$state]);
+            $stack = array_diff($stack, array($state));
 
             foreach ($this->get_all_left_states_from_right_state($state) as $state) {
                 if (!in_array($state, $good_states)) {
