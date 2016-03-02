@@ -35,6 +35,8 @@ abstract class Tokens
     const fi_state = "fi_state";
     const fi_symbol = "fi_symbol";
     const arrow = "arrow";
+
+    const dot = "dot";
 }
 
 abstract  class LexicalDFISTates{

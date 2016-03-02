@@ -17,8 +17,15 @@ function syntactic_analysis()
     }
     return 1;
     */
+    global $arguments;
     print_info_line("Started syntactic analysis");
-    if (S()) {
+    $res = null;
+    if($arguments["just_rules"]){
+        $res = JUST_RULES_START();
+    } else {
+        $res = S();
+    }
+    if ($res) {
         print_info_line("Syntactic ok");
     } else {
         print_error_line("Syntactic error");
@@ -379,4 +386,110 @@ function FINISH_N(&$finish_states)
         return FINISH_N($finish_states);
     }
     return false;
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////rozsireni rules ////////////////////////////////////////////////////////////////////////////////////
+function JUST_RULES_START(){
+    print_info_line("JUST_RULES_START");
+
+    global $FI;
+
+    $rules = array();
+    $endStates = array();
+    $res = JUST_RULES($rules,$endStates);
+    if(!$res)
+        return false;
+
+
+    $FI = FI::createFromRules($rules,$endStates);
+
+    return true;
+}
+
+
+function JUST_RULES(&$rules,&$endStates)
+{
+    global $debug;
+    if ($debug)
+        print_info_line("\tjust_SET OF RULES");
+
+    $rule = null;
+    $is_ending = false;
+    $result = JUST_RULE($rule,$is_ending);
+    if (!$result)
+        return false;
+    $rules[] = $rule;
+
+    if($is_ending)
+        $endStates[] = $rule->getRightState();
+
+    return JUST_RULES_N($rules,$endStates);
+
+}
+
+function JUST_RULE(&$rule,&$isEnding)
+{
+    global $debug,$buffer_id;
+    if ($debug)
+        print_info_line("\tJUST_RULE");
+
+    $token = get_and_print_next_token();
+    if ($token["id"] != Tokens::fi_state)
+        return false;
+    $left_state = $token[$buffer_id];
+
+    $token = get_and_print_next_token();
+    if ($token["id"] != Tokens::fi_symbol)
+        return false;
+
+    $left_symbol = $token[$buffer_id];
+
+    $token = get_and_print_next_token();
+    if ($token["id"] != Tokens::arrow)
+        return false;
+
+    $token = get_and_print_next_token();
+    if ($token["id"] != Tokens::fi_state)
+        return false;
+
+    $right_state = $token[$buffer_id];
+
+    $rule = new Rule($left_state,$left_symbol,$right_state);
+
+    $token = get_and_print_next_token();
+    if($token["id"] == Tokens::dot)
+        $isEnding = true;
+    else {
+        $isEnding = false;
+        put_token_back($token);
+    }
+
+
+    return true;
+}
+
+function JUST_RULES_N(&$rules,&$endStates)
+{
+    global $debug;
+    if ($debug)
+        print_info_line("\tJUST_RULES_N");
+
+    $token = get_and_print_next_token();
+    if ($token["id"] == Tokens::comma) {
+        $rule = null;
+        $isEnding = false;
+        $result = JUST_RULE($rule,$isEnding);
+        if ($result) {
+            $rules[]= $rule;
+            if($isEnding)
+                $endStates[] = $rule->getRightState();
+            return JUST_RULES_N($rules,$endStates);
+        }
+        else
+            return false;
+
+    } else
+        return $token == null;
 }

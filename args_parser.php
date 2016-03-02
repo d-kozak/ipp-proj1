@@ -19,10 +19,11 @@ function parse_arguments()
         "determinization",
         "case-insensitive",
         "wsfa",
-        "analyze-string:"
+        "analyze-string:",
+        "rules-only"
     );
 
-    $short_opts = "edi"; // e=no epsilon d=determinization  i=case insensitive
+    $short_opts = "edir"; // e=no epsilon d=determinization  i=case insensitive
 
     $options = getopt($short_opts, $long_opts);
 
@@ -73,6 +74,12 @@ function parse_arguments()
     } else {
         $arguments["output"] = STDOUT;
     }
+
+    if(isset($options[$long_opts[8]]) || isset($options["r"]))
+        $arguments["just_rules"] = true;
+    else
+        $arguments["just_rules"] = false;
+
 
     $no_eps = false;
     $determinizaton = false;

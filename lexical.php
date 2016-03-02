@@ -9,27 +9,31 @@
 $last_char = null;
 $next_token = null;
 
-function put_token_back($token){
+function put_token_back($token)
+{
     global $next_token;
-    if($next_token != null){
+    if ($next_token != null) {
         print_error_line("next token variable should be always null when calling put_token_back");
         exit(666);
     }
     $next_token = $token;
 }
 
-function print_token($tkn){
+function print_token($tkn)
+{
     global $buffer_id;
-    print_info_line("\tTOKEN:\n\t\ttype : " .$tkn["id"] . " \n\t\tvalue: " . $tkn[$buffer_id] . PHP_EOL);
+    print_info_line("\tTOKEN:\n\t\ttype : " . $tkn["id"] . " \n\t\tvalue: " . $tkn[$buffer_id] . PHP_EOL);
 }
 
-function get_and_print_next_token(){
+function get_and_print_next_token()
+{
     $token = get_next_token();
     print_token($token);
     return $token;
 }
 
-function read_one_char(){
+function read_one_char()
+{
     global $arguments;
     //print_r($arguments["input"]);
     $char = array_shift($arguments["input"]);
@@ -41,9 +45,9 @@ function read_one_char(){
 
 function get_next_token()
 {
-    global  $arguments,$last_char, $buffer_id,$next_token,$debug_lexical;
+    global $arguments, $last_char, $buffer_id, $next_token, $debug_lexical;
 
-    if($next_token != null){
+    if ($next_token != null) {
         $tmp = $next_token;
         $next_token = null;
         return $tmp;
@@ -62,13 +66,13 @@ function get_next_token()
         } else
             $next_char = read_one_char();
 
-        if($next_char == null)
+        if ($next_char == null)
             break;
 
-       // echo "Next char: " . $next_char . PHP_EOL;
+        // echo "Next char: " . $next_char . PHP_EOL;
 
-        if($debug_lexical)
-            if($state != LexicalDFISTates::comment)
+        if ($debug_lexical)
+            if ($state != LexicalDFISTates::comment)
                 echo "state: " . $state . PHP_EOL;
 
         switch ($state) {
@@ -90,10 +94,15 @@ function get_next_token()
                     return $token;
                 } elseif ($next_char == "-") {
                     $state = LexicalDFISTates::dash;
-                } elseif($next_char == "#"){
+                } elseif ($next_char == "#") {
                     $state = LexicalDFISTates::comment;
-                }
-                elseif ($next_char == '\'')
+                } elseif ($next_char == ".") {
+                    if ($arguments["just_rules"]) {
+                        $token["id"] = Tokens::dot;
+                        return $token;
+                    } else
+                        mindfuck($state, $next_char);;
+                } elseif ($next_char == '\'')
                     $state = LexicalDFISTates::symbol_1;
                 elseif (ctype_alnum($next_char)) {
                     $token[$buffer_id] .= $next_char;
@@ -117,7 +126,11 @@ function get_next_token()
                 } else if (ctype_alnum($next_char)) {
                     $token[$buffer_id] .= $next_char;
 
-                }else
+                } elseif ($arguments["just_rules"] && $next_char == ".") {
+                    $next_token = ".";
+                    $token["id"] = Tokens::fi_state;
+                    return $token;
+                } else
                     mindfuck($state, $next_char);
                 break;
 
@@ -166,20 +179,20 @@ function get_next_token()
                     $token[$buffer_id] = '\'\'';
                     return $token;
                 } else {
-                    mindfuck($state,$next_char);
+                    mindfuck($state, $next_char);
                 }
                 break;
 
             case LexicalDFISTates::dash:
-                if($next_char == ">"){
+                if ($next_char == ">") {
                     $token["id"] = Tokens::arrow;
                     return $token;
                 } else
-                    mindfuck($state,$next_token);
+                    mindfuck($state, $next_token);
                 break;
 
             case LexicalDFISTates::comment:
-                if($next_char == "\n")
+                if ($next_char == "\n")
                     $state = LexicalDFISTates::start;
                 break;
 
@@ -195,6 +208,6 @@ function get_next_token()
 function mindfuck($state, $next_char)
 {
     print_error_line("bad char " . $next_char . " in state " . $state . " in get next token");
-    echo "value = " . intval($next_char) .PHP_EOL;
+    echo "value = " . intval($next_char) . PHP_EOL;
     exit(666);
 }

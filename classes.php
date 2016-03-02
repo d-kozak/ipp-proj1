@@ -117,6 +117,21 @@ class FI
     private $startState;
     private $finishStates;
 
+    public static function createFromRules(Array $rules,Array $endStates){
+        print_var($rules);
+        print_var($endStates);
+
+        $states = array();
+        $alphabet = array();
+        foreach($rules as $rule) {
+            $states[] = $rule->getLeftState();
+            $alphabet[] = $rule->getCharacter();
+        }
+        $startState = $rules[0]->getLeftState();
+
+        return new FI($states,$alphabet,$rules,$startState,$endStates);
+    }
+
     /**
      * FI constructor.
      * @param $states
@@ -664,7 +679,10 @@ function state_cmp($a, $b)
         return strcmp($a,$b);
     elseif ($a instanceof SuperState && $b instanceof SuperState) {
         return state_cmp($a->getStates(), $b->getStates());
-    }
+    } elseif($a instanceof SuperState)
+        return state_cmp($a->getStates(),$b);
+    elseif($b instanceof SuperState)
+        return state_cmp($a,$b->getStates());
 
     $len = min(count($a),count($b));
 
