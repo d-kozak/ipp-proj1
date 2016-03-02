@@ -480,12 +480,14 @@ class FI
     function add_rules_for_printing(&$result)
     {
         $rules = $this->getRules();
-        usort($rules,"rule_cmp");
-        foreach ($rules as $rule) {
-            $result .= $rule->getLeftState() . " '" . $rule->getCharacter() . "' -> " . $rule->getRightState() . ",\n";
+        if(!empty($rules)) {
+            usort($rules, "rule_cmp");
+            foreach ($rules as $rule) {
+                $result .= $rule->getLeftState() . " '" . $rule->getCharacter() . "' -> " . $rule->getRightState() . ",\n";
+            }
+            $result = substr($result, 0, -2);
+            $result .= "\n";
         }
-        $result = substr($result,0,-2);
-        $result .= "\n";
     }
 
     public function wsfa()

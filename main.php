@@ -1,4 +1,5 @@
 <?php
+include 'include.php';
 /**
  * Created by PhpStorm.
  * User: david
@@ -14,7 +15,7 @@ header('Content-type: text/plain; charset=utf-8');
 
 
 
-include 'include.php';
+
 
 
 
