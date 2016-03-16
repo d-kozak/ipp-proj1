@@ -1,10 +1,10 @@
 <?php
+#Modul pro tridu reprezentujici slozeny stav
+#DKA:xkozak15
 
 /**
- * Created by PhpStorm.
- * User: david
- * Date: 18.2.16
- * Time: 9:05
+ * Class SuperState reprezentuje slozeny stav v algoritmu determinizace
+ * @see FI::determinize
  */
 class SuperState
 {
@@ -12,7 +12,7 @@ class SuperState
 
     /**
      * SuperState constructor.
-     * @param $states
+     * @param $states - pole stavu, ze kterych se ma nove vytvareny superstav skladat
      */
     public function __construct($states)
     {
@@ -24,6 +24,10 @@ class SuperState
         $this->states = $states;
     }
 
+    /**
+     * funkce vrati retezcovou reprezentaci slozeneho stavu
+     * @return string
+     */
     public function get_super_state_id(){
         $result = "";
         foreach($this->states as $state){
@@ -32,6 +36,10 @@ class SuperState
         return substr($result,0,-1);
     }
 
+    /**
+     * funkce vrati retezcovou reprezentaci slozeneho stavu
+     * @return string
+     */
     function __toString()
     {
         $result = "";
@@ -41,11 +49,16 @@ class SuperState
         return substr($result,0,-1);
     }
 
+    /**
+     * Fce vraci iterator nad jednotlivymi stavy
+     * @return ArrayIterator
+     */
     public function get_iterator(){
         return new ArrayIterator($this->states);
     }
 
     /**
+     * Funkce vraci pole stavu, ktere slozeny stav zahrnuje
      * @return array
      */
     public function getStates()

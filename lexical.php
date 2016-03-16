@@ -1,30 +1,41 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: david
- * Date: 15.2.16
- * Time: 20:10
- */
+#Modul pro lexikalni analyzu
+#DKA:xkozak15
 
+/**
+ * Pomocne promenne pro docasne uchovani informaci mezi jednotlivymi volani funkci
+ */
 $last_char = null;
 $next_token = null;
 
+/**
+ * Funkce vrati token $token zpet, lexikalni analyza ho vrati pri dalsim volani get_next_token, pamet POUZE pro jednu polozku!
+ * @param $token
+ */
 function put_token_back($token)
 {
     global $next_token;
     if ($next_token != null) {
         print_error_line("next token variable should be always null when calling put_token_back");
-        exit(666);
+        exit(10);
     }
     $next_token = $token;
 }
 
+/**
+ * Pomocna debugovaci funkce, vypise obsah tokenu $tkn
+ * @param $tkn
+ */
 function print_token($tkn)
 {
     global $buffer_id;
     print_info_line("\tTOKEN:\n\t\ttype : " . $tkn["id"] . " \n\t\tvalue: " . $tkn[$buffer_id] . PHP_EOL);
 }
 
+/**
+ * Funkce vrati token a vypise jeho obsah na stdout(pokud jsou povoleny debugovaci informace)
+ * @return $token
+ */
 function get_and_print_next_token()
 {
     $token = get_next_token();
@@ -32,6 +43,11 @@ function get_and_print_next_token()
     return $token;
 }
 
+/**
+ * Funkce precte jeden znak z nactenych znaku(jsou predem cachovany
+ * @see args_parser
+ * @return mixed
+ */
 function read_one_char()
 {
     global $arguments;
@@ -43,6 +59,11 @@ function read_one_char()
     return $char;
 }
 
+/**
+ * Hlavni funkce lexikalni analyzy, cte znak po znaku data ze vstupu a rozpoznava tokeny
+ * vyuziti konecneho automatu viz dokumentace
+ * @return $token token
+ */
 function get_next_token()
 {
     global $arguments, $last_char, $buffer_id, $next_token, $debug_lexical;
@@ -101,7 +122,7 @@ function get_next_token()
                         $token["id"] = Tokens::dot;
                         return $token;
                     } else
-                        mindfuck($state, $next_char);;
+                        err_msg($state, $next_char);;
                 } elseif ($next_char == '\'')
                     $state = LexicalDFISTates::symbol_1;
                 elseif (ctype_alnum($next_char)) {
@@ -110,7 +131,7 @@ function get_next_token()
                 } elseif (ctype_space($next_char)) {
                     continue;
                 } else
-                    mindfuck($state, $next_char);
+                    err_msg($state, $next_char);
                 break;
 
             case LexicalDFISTates::state_1:
@@ -131,7 +152,7 @@ function get_next_token()
                     $token["id"] = Tokens::fi_state;
                     return $token;
                 } else
-                    mindfuck($state, $next_char);
+                    err_msg($state, $next_char);
                 break;
 
             case LexicalDFISTates::state_2:
@@ -141,7 +162,7 @@ function get_next_token()
                 } else if ($next_char == "_") {
                     $token[$buffer_id] .= $next_char;
                 } else
-                    mindfuck($state, $next_char);
+                    err_msg($state, $next_char);
                 break;
 
             case LexicalDFISTates::symbol_1:
@@ -159,7 +180,7 @@ function get_next_token()
                     $token["id"] = Tokens::fi_symbol;
                     return $token;
                 } else
-                    mindfuck($state, $next_char);
+                    err_msg($state, $next_char);
                 break;
 
             case LexicalDFISTates::symbol_wait_for_double_quote:
@@ -179,7 +200,7 @@ function get_next_token()
                     $token[$buffer_id] = '\'\'';
                     return $token;
                 } else {
-                    mindfuck($state, $next_char);
+                    err_msg($state, $next_char);
                 }
                 break;
 
@@ -188,7 +209,7 @@ function get_next_token()
                     $token["id"] = Tokens::arrow;
                     return $token;
                 } else
-                    mindfuck($state, $next_token);
+                    err_msg($state, $next_token);
                 break;
 
             case LexicalDFISTates::comment:
@@ -198,16 +219,21 @@ function get_next_token()
 
             default:
                 print_error_line("Default state in get next token Fi");
-                exit(666);
+                exit(105);
 
         }
     }
     return null;
 }
 
-function mindfuck($state, $next_char)
+/**
+ * Funkce vypise, kde doslo k chybovemu stavu, vyuziti hlavne pri debugovani a dohledavani, kde se lexikalni chyba nachazi
+ * @param $state
+ * @param $next_char
+ */
+function err_msg($state, $next_char)
 {
     print_error_line("bad char " . $next_char . " in state " . $state . " in get next token");
     echo "value = " . intval($next_char) . PHP_EOL;
-    exit(666);
+    exit(40);
 }

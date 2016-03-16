@@ -1,42 +1,9 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: david
- * Date: 15.2.16
- * Time: 20:07
- */
-
-function syntactic_analysis()
-{
-    /*
-    while(($token = get_next_token()) != null){
-        echo "token: ";
-        print_r($token);
-        echo PHP_EOL;
-        //fgetc(STDIN);
-    }
-    return 1;
-    */
-    global $arguments;
-    print_info_line("Started syntactic analysis");
-    $res = null;
-    if($arguments["just_rules"]){
-        $res = JUST_RULES_START();
-    } else {
-        $res = S();
-    }
-    if ($res) {
-        print_info_line("Syntactic ok");
-    } else {
-        print_error_line("Syntactic error");
-        return false;
-    }
-    print_info_line("Finishes syntactic analysis");
-
-    return true;
-}
+#Modul syntakticke analyzy
+#DKA:xkozak15
 
 /*
+LL gramatika pro klasickou variantu, nasledujici funkce ji modeluji za pomoci rekurzivniho sestupu
 
 S->(START_TWO)
 
@@ -62,6 +29,36 @@ RULES_N -> ,RULE RULES_N
 
 */
 
+/**
+ * Hlavni funkce modulu, rekurzivne v sobe vola ostatni funkce, v zavislosti na vstupnich argumentech skriptu
+ * spusti bud klasickou syntaktickou analyzu ci syntaktickou analyzu pro rozsireni RUL
+ * @return bool true OK, false pri syntakticke chybe
+ */
+function syntactic_analysis()
+{
+    global $arguments;
+    print_info_line("Started syntactic analysis");
+    $res = null;
+    if($arguments["just_rules"]){
+        $res = JUST_RULES_START();
+    } else {
+        $res = S();
+    }
+    if ($res) {
+        print_info_line("Syntactic ok");
+    } else {
+        print_error_line("Syntactic error");
+        return false;
+    }
+    print_info_line("Finishes syntactic analysis");
+
+    return true;
+}
+
+/**
+ * Hlavni funkce klasicke syntakticke analyzy
+ * @see syntactic_analysis
+ */
 function S()
 {
     global $debug;
@@ -88,6 +85,10 @@ function S()
     return true;
 }
 
+/**
+ * pomocna funkce syntakticke analyzy
+ * @see syntactic_analysis
+ */
 function START_TWO()
 {
     global $debug,$buffer_id,$FI;
@@ -185,6 +186,10 @@ function START_TWO()
     return true;
 }
 
+/**
+ * pomocna funkce syntakticke analyzy
+ * @see syntactic_analysis
+ */
 function STATES(&$states)
 {
     global $debug, $buffer_id;
@@ -201,6 +206,10 @@ function STATES(&$states)
 
 }
 
+/**
+ * pomocna funkce syntakticke analyzy
+ * @see syntactic_analysis
+ */
 function STATES_N(&$states)
 {
     global $debug, $buffer_id;
@@ -224,6 +233,10 @@ function STATES_N(&$states)
 
 }
 
+/**
+ * pomocna funkce syntakticke analyzy
+ * @see syntactic_analysis
+ */
 function ALPHABET(&$alphabet)
 {
     global $debug, $buffer_id;
@@ -240,6 +253,10 @@ function ALPHABET(&$alphabet)
 
 }
 
+/**
+ * pomocna funkce syntakticke analyzy
+ * @see syntactic_analysis
+ */
 function ALPHABET_N(&$alphabet)
 {
     global $debug, $buffer_id;
@@ -263,6 +280,10 @@ function ALPHABET_N(&$alphabet)
 
 }
 
+/**
+ * pomocna funkce syntakticke analyzy
+ * @see syntactic_analysis
+ */
 function RULES(&$rules)
 {
     global $debug;
@@ -287,6 +308,10 @@ function RULES(&$rules)
 
 }
 
+/**
+ * pomocna funkce syntakticke analyzy
+ * @see syntactic_analysis
+ */
 function RULE(&$rule)
 {
     global $debug,$buffer_id;
@@ -319,6 +344,10 @@ function RULE(&$rule)
     return true;
 }
 
+/**
+ * pomocna funkce syntakticke analyzy
+ * @see syntactic_analysis
+ */
 function RULES_N(&$rules)
 {
     global $debug;
@@ -345,6 +374,10 @@ function RULES_N(&$rules)
 
 }
 
+/**
+ * pomocna funkce syntakticke analyzy
+ * @see syntactic_analysis
+ */
 function FINISH(&$finish_states)
 {
     global $debug,$buffer_id;
@@ -366,6 +399,10 @@ function FINISH(&$finish_states)
     return FINISH_N($finish_states);
 }
 
+/**
+ * pomocna funkce syntakticke analyzy
+ * @see syntactic_analysis
+ */
 function FINISH_N(&$finish_states)
 {
     global $debug,$buffer_id;
@@ -391,6 +428,20 @@ function FINISH_N(&$finish_states)
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////rozsireni rules ////////////////////////////////////////////////////////////////////////////////////
+/*
+LL gramatika:
+START->RULE RULES_N
+RULE->state symbol -> state DOT
+DOT-> .
+DOT-> epsilon
+RULES_N->,RULE RULES_N
+RULES_N->epsilon
+*/
+
+/**
+ * Hlavni funkce syntakticke analyzy v rozsireni RUL
+ * @see syntactic_analysis
+ */
 function JUST_RULES_START(){
     print_info_line("JUST_RULES_START");
 
@@ -408,7 +459,10 @@ function JUST_RULES_START(){
     return true;
 }
 
-
+/**
+ * pomocna funkce syntakticke analyzy
+ * @see syntactic_analysis
+ */
 function JUST_RULES(&$rules,&$endStates)
 {
     global $debug;
@@ -429,6 +483,10 @@ function JUST_RULES(&$rules,&$endStates)
 
 }
 
+/**
+ * pomocna funkce syntakticke analyzy
+ * @see syntactic_analysis
+ */
 function JUST_RULE(&$rule,&$isEnding)
 {
     global $debug,$buffer_id;
@@ -470,6 +528,10 @@ function JUST_RULE(&$rule,&$isEnding)
     return true;
 }
 
+/**
+ * pomocna funkce syntakticke analyzy
+ * @see syntactic_analysis
+ */
 function JUST_RULES_N(&$rules,&$endStates)
 {
     global $debug;

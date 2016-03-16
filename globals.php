@@ -1,19 +1,27 @@
 <?php
+#Modul pro globalni promenne a konstanty
+#DKA:xkozak15
+
 /**
- * Created by PhpStorm.
- * User: david
- * Date: 15.2.16
- * Time: 20:10
+ * Pole uchovavajici informace nutne pro beh programu
+ * @see args_parser::parse_arguments
  */
 $arguments = array();
 
 $buffer_id = "buffer";
 
+// flags pro debugvani
 $debug = false;
 $debug_lexical = $debug;
 
+/**
+ * Promenna obsahujici instanci konecny automat, tedy hlavni orientacni bod celeho skriptu
+ */
 $FI = null;
 
+/**
+ * vyctovy typ pro typy tokenu
+ */
 abstract class Tokens
 {
     /*
@@ -39,7 +47,11 @@ abstract class Tokens
     const dot = "dot";
 }
 
-abstract  class LexicalDFISTates{
+/*
+ *  vyctovy typ pro stavy konencho automatu v lexikalni analyze
+ */
+abstract class LexicalDFISTates
+{
     /*
     const start = 50;
     const symbol_1 = 51;
@@ -56,7 +68,7 @@ abstract  class LexicalDFISTates{
     */
 
     const start = "start";
-    const symbol_1 =  "symbol_1";
+    const symbol_1 = "symbol_1";
     const symbol_wait_for_quote = "symbol_wait_for_quote";
     const symbol_wait_for_double_quote = "symbol_wait_for_double_quote";
     const symbol_wait_for_double_quote_2 = "symbol_wait_for_double_quote 2";

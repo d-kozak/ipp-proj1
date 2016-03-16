@@ -1,10 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: david
- * Date: 15.2.16
- * Time: 20:12
- */
+#Modul obsahujici vsechny includes v poradi nutnem pro jejich korektni fungovani
+#DKA:xkozak15
 
 include 'globals.php';
 include 'lexical.php';

@@ -1,10 +1,9 @@
 <?php
+#Modul obsahujici hlavni tridy Rule pro pravidla a FI pro cely konecny automat
+#DKA:xkozak15
 
 /**
- * Created by PhpStorm.
- * User: david
- * Date: 15.2.16
- * Time: 11:12
+ * Class Rule reprezentuje jedno pravidlo
  */
 class Rule
 {
@@ -25,6 +24,11 @@ class Rule
         $this->right_state = $right_state;
     }
 
+    /**
+     * Overi semantickou spravnost daneho pravidla
+     * @param FI $FI - konecny automat, ve kterem se dane pravidlo ma nachazet
+     * @return bool true OK false chyba
+     */
     public function check_rule(FI $FI)
     {
         $states = $FI->getStates();
@@ -47,11 +51,17 @@ class Rule
         return true;
     }
 
+    /**
+     * @return bool true - epsilon pravidlo false jinak
+     */
     public function is_epsilon_rule()
     {
         return $this->character == " ";
     }
 
+    /**
+     * @return string retezcova reprezentace objektu
+     */
     function __toString()
     {
         return $this->left_state . $this->character . $this->right_state;
@@ -59,7 +69,7 @@ class Rule
 
 
     /**
-     * @return mixed
+     * @return mixed levy stav
      */
     public function getLeftState()
     {
@@ -67,7 +77,7 @@ class Rule
     }
 
     /**
-     * @return mixed
+     * @return mixed symbol
      */
     public function getCharacter()
     {
@@ -75,7 +85,7 @@ class Rule
     }
 
     /**
-     * @return mixed
+     * @return mixed pravy stav
      */
     public function getRightState()
     {
@@ -109,6 +119,9 @@ class Rule
 
 }
 
+/**
+ * Class FI reprezentuje samotny konecny automat
+ */
 class FI
 {
     private $states;
@@ -117,6 +130,13 @@ class FI
     private $startState;
     private $finishStates;
 
+    /**
+     * Tovarni metoda, ktera vytvori objekt tridy FI pouze z mnoziny pravidel a konecnych stavu
+     * pro rozsireni RUL
+     * @param array $rules
+     * @param array $endStates
+     * @return FI
+     */
     public static function createFromRules(Array $rules,Array $endStates){
         print_var($rules);
         print_var($endStates);
@@ -187,6 +207,10 @@ class FI
         $this->finishStates = $finishStates;
     }
 
+    /**
+     * Metoda provede semanticke kontroly automatu
+     * @return bool true OK false chyba
+     */
     public function check_fi()
     {
         global $debug;
@@ -220,6 +244,9 @@ class FI
         return true;
     }
 
+    /**
+     * Funkce odstrani z automatu epsilon prechody za pomoci algoritmu z IFJ
+     */
     public function remove_epsilon_rules()
     {
         $new_rules = array();
@@ -254,6 +281,11 @@ class FI
         $this->finishStates = $new_finish_states;
     }
 
+    /**
+     * Funkce navrati epsilon uzaver daneho stavu, pomocna funkce
+     * @param $state
+     * @return array epsilon uzaver daneho stavu
+     */
     public function get_epsilon_uzaver($state)
     {
         if (!in_array($state, $this->states)) {
@@ -286,6 +318,11 @@ class FI
         return $epsilon_uzaver;
     }
 
+    /**
+     * Funkce vrati vsechny epsilon pravidla s odpovidajicim levym uzlem
+     * @param $state
+     * @return array vsechny epsilon pravidla s odpovidajicim levym uzlem
+     */
     private function get_epsilon_rules($state)
     {
         $result = array();
@@ -298,6 +335,11 @@ class FI
         return $result;
     }
 
+    /**
+     * Funkce vrati vsechny non-epsilon pravidla s odpovidajicim levym uzlem
+     * @param $state
+     * @return array vsechny non-epsilon pravidla s odpovidajicim levym uzlem
+     */
     private function get_non_epsilon_rules($state)
     {
         $result = array();
@@ -310,6 +352,10 @@ class FI
         return $result;
     }
 
+    /**
+     * Pomocna funkce semanticke analyzy, overi vsechna pravidla automatu
+     * @return bool
+     */
     private function check_states()
     {
         foreach ($this->rules as $rule) {
@@ -319,6 +365,9 @@ class FI
         return true;
     }
 
+    /**
+     * Funkce realizuje determinizaci konecneho automatu
+     */
     public function determinize()
     {
         global $debug;
@@ -390,6 +439,11 @@ class FI
         print_info_line("-----------------------Determinization finished---------------------------");
     }
 
+    /**
+     * Funkce vraci vsechny stavy prave stavy
+     * @param $rules
+     * @return array
+     */
     private function get_right_states_from_array_of_rules($rules){
         $result = array();
         foreach($rules as $rule){
@@ -398,6 +452,12 @@ class FI
         return $result;
     }
 
+    /**
+     * Funkce vraci vsechna pravidla se specifickou levou stranou a symbolem
+     * @param $left_state
+     * @param $symbol
+     * @return array vsechna pravidla se specifickou levou stranou a symbolem
+     */
     private function get_rules_with_left_state_and_symbol($left_state,$symbol){
         $result  = array();
         foreach($this->getRules() as $rule){
@@ -408,6 +468,9 @@ class FI
         return $result;
     }
 
+    /**
+     * Funkce vypise soucasnou podobu konecneho automatu do souboru v presne dane podobe
+     */
     public function print_FI()
     {
         global $arguments;
@@ -433,11 +496,17 @@ class FI
         $this->add_finish_states_for_printing($result);
         $result .= "}\n)";
 
+        // v "output" se skryva bud otevreny vystupni soubor, nebo stdout
         fprintf($arguments["output"], $result);
 
         print_info_line("--------end--------");
     }
 
+    /**
+     * Pomocna funkce vypisovani
+     * @see print_FI
+     * @param $result
+     */
     function add_states_for_printing(&$result)
     {
         $states = $this->getStates();
@@ -452,6 +521,11 @@ class FI
         }
     }
 
+    /**
+     * Pomocna funkce vypisovani
+     * @see print_FI
+     * @param $result
+     */
     function add_finish_states_for_printing(&$result)
     {
         $states = $this->getFinishStates();
@@ -465,6 +539,11 @@ class FI
         }
     }
 
+    /**
+     * Pomocna funkce vypisovani
+     * @see print_FI
+     * @param $result
+     */
     function add_alphabet_for_printing(&$result)
     {
         $alphabet = $this->getAlphabet();
@@ -478,6 +557,11 @@ class FI
         }
     }
 
+    /**
+     * Pomocna funkce vypisovani
+     * @see print_FI
+     * @param $result
+     */
     function add_rules_for_printing(&$result)
     {
         $rules = $this->getRules();
@@ -491,6 +575,9 @@ class FI
         }
     }
 
+    /**
+     * Funkce upravi automat do podoby dobre specifikovaneho konecneho automatu
+     */
     public function wsfa()
     {
         print_info_line("-------------------here----------------");
@@ -499,6 +586,10 @@ class FI
         $this->complete_rules();
     }
 
+    /**
+     * Pomocna funce WSFA, pro vsechny stavy vsechna pravidla tak, aby se automat nikdy "nezaseknul"
+     * vsechna tato nove vytvorena pravidla konci ve stavu qFalse
+     */
     private function complete_rules()
     {
         $name = "qFalse";
@@ -525,6 +616,12 @@ class FI
         }
     }
 
+    /**
+     * Funkce overi, zda mnozina pravidel obsahuje pravidlo s levym stavem $left_state a symbolem $symbol
+     * @param $left_state
+     * @param $symbol
+     * @return bool
+     */
     private function contains_rule_with_left($left_state, $symbol)
     {
         foreach ($this->getRules() as $rule) {
@@ -534,6 +631,9 @@ class FI
         return false;
     }
 
+    /**
+     * Funkce znovuvytvori mnozinu stavu tak, aby uz neobsahovala zadne neukoncujici stavy
+     */
     private function compute_ending_states()
     {
 
@@ -557,6 +657,11 @@ class FI
             $this->states[] = "qFalse";
     }
 
+    /**
+     * Funkce vraci vsechny leve stavy, ze kterych se jde dostat se specifickeho praveho stavu
+     * @param $state
+     * @return array
+     */
     private function get_all_left_states_from_right_state($state)
     {
         $result = array();
@@ -569,13 +674,16 @@ class FI
         return $result;
     }
 
+    /**
+     * Funkce rozsireni STR, overi, zda automat prijima dany retez
+     * @param $string
+     */
     public function check_string($string)
     {
+        // nejdrive je potreba determinizovat
         $this->check_string_symbols($string);
         $this->determinize();
         $current_state = $this->getStartState();
-
-        //$this->print_FI();
 
         $strlen = strlen($string);
         for ($i = 0; $i < $strlen; $i++, $next_state = $current_state) {
@@ -600,6 +708,10 @@ class FI
         exit(0);
     }
 
+    /**
+     * Funkce overi, zda se v retezci $string nachazi pouze znaky z abecedy daneho automatu
+     * @param $string
+     */
     private function check_string_symbols($string)
     {
         $strlen = strlen($string);
@@ -613,6 +725,11 @@ class FI
         }
     }
 
+    /**
+     * Funkce vraci vsechna pravidla, ktera maji specificky levy stav
+     * @param $state
+     * @return array
+     */
     private function get_rules_with_left_state($state)
     {
         $rules = array();
@@ -666,6 +783,12 @@ class FI
 
 }
 
+/**
+ * Pomocna funkce pro porovnavani pravidel
+ * @param Rule $a
+ * @param Rule $b
+ * @return int
+ */
 function rule_cmp(Rule $a,Rule $b){
     $res = state_cmp($a->getLeftState(),$b->getLeftState());
     if($res != 0)
@@ -676,6 +799,12 @@ function rule_cmp(Rule $a,Rule $b){
     return state_cmp($a->getRightState(),$b->getRightState());
 }
 
+/**
+ * Pomocna funkce pro porovnani stavu
+ * @param $a
+ * @param $b
+ * @return int
+ */
 function state_cmp($a, $b)
 {
     if(is_string($a) && is_string($b))
