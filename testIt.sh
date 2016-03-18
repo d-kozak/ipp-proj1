@@ -2,11 +2,12 @@
 
 echo "---------------------------------------------Tests started-----------------------------------------"
 
-./distrib.sh
-cp ./dka.php ../dka-supplementary-tests/dka.php
+./final_distrib.sh
+cp ./xkozak15-DKA.zip ../dka-supplementary-tests/
 
 
 cd ../dka-supplementary-tests
+unzip xkozak15-DKA.zip
 ./_stud_tests.sh
 
 if [ $? -ne 0 ]; then
