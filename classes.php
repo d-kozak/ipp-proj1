@@ -137,19 +137,20 @@ class FI
      * @param array $endStates
      * @return FI
      */
-    public static function createFromRules(Array $rules,Array $endStates){
+    public static function createFromRules(Array $rules, Array $endStates)
+    {
         print_var($rules);
         print_var($endStates);
 
         $states = array();
         $alphabet = array();
-        foreach($rules as $rule) {
+        foreach ($rules as $rule) {
             $states[] = $rule->getLeftState();
             $alphabet[] = $rule->getCharacter();
         }
         $startState = $rules[0]->getLeftState();
 
-        return new FI($states,$alphabet,$rules,$startState,$endStates);
+        return new FI($states, $alphabet, $rules, $startState, $endStates);
     }
 
     /**
@@ -372,7 +373,7 @@ class FI
     {
         global $debug;
         $this->remove_epsilon_rules();
-        if($debug)
+        if ($debug)
             $this->print_FI();
 
         print_info_line("-----------------------Determinization started---------------------------");
@@ -383,7 +384,7 @@ class FI
         $Qd = array();
         $Fd = array();
 
-        while(!empty($Qnew)){
+        while (!empty($Qnew)) {
             $Qcarka = array_shift($Qnew);
             $Qd[] = $Qcarka;
             print_info_line("New qcarka: ");
@@ -391,31 +392,31 @@ class FI
             print_info_line("new qd: ");
             print_var($Qd);
 
-            foreach($this->getAlphabet() as $symbol){
+            foreach ($this->getAlphabet() as $symbol) {
                 $Qcarkacarka = array();
-                foreach($Qcarka->getStates() as $qcarkastate){
-                    $specific_rules = $this->get_rules_with_left_state_and_symbol($qcarkastate,$symbol);
+                foreach ($Qcarka->getStates() as $qcarkastate) {
+                    $specific_rules = $this->get_rules_with_left_state_and_symbol($qcarkastate, $symbol);
                     $specific_states = $this->get_right_states_from_array_of_rules($specific_rules);
 
-                    $Qcarkacarka = array_merge($Qcarkacarka,$specific_states);
+                    $Qcarkacarka = array_merge($Qcarkacarka, $specific_states);
                 }
                 print_info_line("Qcarkacarka for symbol " . $symbol . ":");
                 print_var($Qcarkacarka);
 
                 $Qcarkacarka = array_unique($Qcarkacarka);
                 $newState = new SuperState($Qcarkacarka);
-                if(!empty($Qcarkacarka)){
-                    $rule = new Rule($Qcarka,$symbol,$newState);
-                    if(!in_array($rule,$Rd)) {
+                if (!empty($Qcarkacarka)) {
+                    $rule = new Rule($Qcarka, $symbol, $newState);
+                    if (!in_array($rule, $Rd)) {
                         $Rd[] = $rule;
 
                         print_info_line("new rule: ");
                         print_var($rule);
                     }
                 }
-                if(!in_array($newState,$Qd) && !empty($Qcarkacarka)){
-                    if(!in_array($newState,$Qnew)) {
-                        $Qnew[] =  $newState;
+                if (!in_array($newState, $Qd) && !empty($Qcarkacarka)) {
+                    if (!in_array($newState, $Qnew)) {
+                        $Qnew[] = $newState;
                     }
                     print_info_line("Qnew for next iteration: ");
                     print_var($Qnew);
@@ -423,8 +424,8 @@ class FI
                     print_var($Qd);
                 }
             }
-            $intersection = array_intersect($this->getFinishStates(),$Qcarka->getStates());
-            if(!empty($intersection)){
+            $intersection = array_intersect($this->getFinishStates(), $Qcarka->getStates());
+            if (!empty($intersection)) {
                 $Fd[] = $Qcarka;
             }
             //fgetc(STDIN);
@@ -444,9 +445,10 @@ class FI
      * @param $rules
      * @return array
      */
-    private function get_right_states_from_array_of_rules($rules){
+    private function get_right_states_from_array_of_rules($rules)
+    {
         $result = array();
-        foreach($rules as $rule){
+        foreach ($rules as $rule) {
             $result[] = $rule->getRightState();
         }
         return $result;
@@ -458,10 +460,11 @@ class FI
      * @param $symbol
      * @return array vsechna pravidla se specifickou levou stranou a symbolem
      */
-    private function get_rules_with_left_state_and_symbol($left_state,$symbol){
-        $result  = array();
-        foreach($this->getRules() as $rule){
-            if($rule->getLeftState() == $left_state && $rule->getCharacter() == $symbol){
+    private function get_rules_with_left_state_and_symbol($left_state, $symbol)
+    {
+        $result = array();
+        foreach ($this->getRules() as $rule) {
+            if ($rule->getLeftState() == $left_state && $rule->getCharacter() == $symbol) {
                 $result[] = $rule;
             }
         }
@@ -529,7 +532,7 @@ class FI
     function add_finish_states_for_printing(&$result)
     {
         $states = $this->getFinishStates();
-        usort($states,"state_cmp");
+        usort($states, "state_cmp");
         $len = count($states);
         for ($i = 0; $i < $len; $i++) {
             if ($i < $len - 1)
@@ -565,7 +568,7 @@ class FI
     function add_rules_for_printing(&$result)
     {
         $rules = $this->getRules();
-        if(!empty($rules)) {
+        if (!empty($rules)) {
             usort($rules, "rule_cmp");
             foreach ($rules as $rule) {
                 $result .= $rule->getLeftState() . " '" . $rule->getCharacter() . "' -> " . $rule->getRightState() . ",\n";
@@ -680,13 +683,14 @@ class FI
      */
     public function check_string($string)
     {
+        global $arguments;
         // nejdrive je potreba determinizovat
         $this->check_string_symbols($string);
         $this->determinize();
         $current_state = $this->getStartState();
 
         $strlen = strlen($string);
-        for ($i = 0; $i < $strlen; $i++, $next_state = $current_state) {
+        for ($i = 0; $i < $strlen; $i++, $current_state = $next_state) {
             $char = substr($string, $i, 1);
             $next_state = null;
 
@@ -699,12 +703,17 @@ class FI
             }
             if ($next_state == null) {
                 print_error_line("There is no way to go from state " . $current_state . " with symbol " . $char);
-                echo "0";
+                fprintf($arguments["output"], "0");
                 exit(0);
             }
         }
-        print_info_line("The string was accepted");
-        echo "1";
+        if (in_array($current_state, $this->finishStates)) {
+            print_info_line("The string was accepted");
+            fprintf($arguments["output"], "1");
+        } else {
+            print_info_line("The string was not accepted");
+            fprintf($arguments["output"], "0");
+        }
         exit(0);
     }
 
@@ -789,14 +798,15 @@ class FI
  * @param Rule $b
  * @return int
  */
-function rule_cmp(Rule $a,Rule $b){
-    $res = state_cmp($a->getLeftState(),$b->getLeftState());
-    if($res != 0)
+function rule_cmp(Rule $a, Rule $b)
+{
+    $res = state_cmp($a->getLeftState(), $b->getLeftState());
+    if ($res != 0)
         return $res;
-    $res = strcmp($a->getCharacter(),$b->getCharacter());
-    if($res != 0)
+    $res = strcmp($a->getCharacter(), $b->getCharacter());
+    if ($res != 0)
         return $res;
-    return state_cmp($a->getRightState(),$b->getRightState());
+    return state_cmp($a->getRightState(), $b->getRightState());
 }
 
 /**
@@ -807,27 +817,27 @@ function rule_cmp(Rule $a,Rule $b){
  */
 function state_cmp($a, $b)
 {
-    if(is_string($a) && is_string($b))
-        return strcmp($a,$b);
+    if (is_string($a) && is_string($b))
+        return strcmp($a, $b);
     elseif ($a instanceof SuperState && $b instanceof SuperState) {
         return state_cmp($a->getStates(), $b->getStates());
-    } elseif($a instanceof SuperState)
-        return state_cmp($a->getStates(),$b);
-    elseif($b instanceof SuperState)
-        return state_cmp($a,$b->getStates());
+    } elseif ($a instanceof SuperState)
+        return state_cmp($a->getStates(), $b);
+    elseif ($b instanceof SuperState)
+        return state_cmp($a, $b->getStates());
 
-    $len = min(count($a),count($b));
+    $len = min(count($a), count($b));
 
-    for($i = 0 ; $i < $len ; $i++){
-        if($a[$i] > $b[$i]){
+    for ($i = 0; $i < $len; $i++) {
+        if ($a[$i] > $b[$i]) {
             return 1;
-        } elseif($a[$i] < $b[$i]){
+        } elseif ($a[$i] < $b[$i]) {
             return -1;
         }
     }
-    if(count($a) > count($b))
+    if (count($a) > count($b))
         return 1;
-    elseif(count($b) > count($a))
+    elseif (count($b) > count($a))
         return -1;
     else return 0;
 }
