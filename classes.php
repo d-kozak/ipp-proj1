@@ -291,7 +291,7 @@ class FI
     {
         if (!in_array($state, $this->states)) {
             print_error_line("internal error, epsilon uzaver called with illegal state " . $state);
-            exit(666);
+            exit(101);
         }
 
         $epsilon_uzaver = array($state);
